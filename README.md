@@ -1,104 +1,64 @@
-# Portfolio with a repo-grounded AI assistant
+# Sushant Mudalgi · Portfolio
 
-A fast, static portfolio site with an "Ask about my work" assistant. Visitors ask a
-question; the assistant answers from your profile and your repos' READMEs and design
-docs, and cites which repo each fact came from.
+**Live site: https://sushantm47.github.io**
 
-Everything runs on free tiers: GitHub Pages hosts the site, a Cloudflare Worker keeps
-the LLM key secret, and a free LLM API (Groq by default) writes the answers. With no
-LLM configured at all, the assistant still works in offline mode by showing the most
-relevant excerpts.
+My personal portfolio, with an assistant you can question about my work. Ask it about
+my projects, experience, skills, or availability, and it answers from my resume and the
+READMEs of my GitHub repositories, citing the source of each fact.
 
-## How it works
+## How the assistant works
+
+The assistant uses retrieval-augmented generation (RAG): it looks up relevant facts at
+question time instead of relying on a model's memory.
 
 ```
-data/profile.json ─┐
-your repo READMEs ─┴─> scripts/build-knowledge.mjs ─> data/knowledge.json   (on every deploy + weekly)
+profile.json ──┐
+repo READMEs ──┴─> build step ─> knowledge.json      (rebuilt on every deploy and weekly)
 
-Browser ── question ──> Cloudflare Worker ── BM25 search over knowledge.json
-                              │
-                              └── top chunks + rules ──> free LLM ──> cited answer
+question ─> BM25 search over knowledge.json ─> top matching excerpts
+                                                  │
+                                                  └─> LLM writes a short answer
+                                                      that cites the excerpts [1] [2]
 ```
 
-This is retrieval-augmented generation (RAG), not fine-tuning. The assistant looks things
-up at question time, so it updates whenever you push, needs no GPU, and is told to answer
-only from what it retrieved and to cite it.
+1. **Indexing:** a build step collects my profile and the README of every public repo I
+   own, splits them into heading-sized chunks, and publishes them as `knowledge.json`.
+   New repos are picked up automatically.
+2. **Retrieval:** each question is matched against the chunks with BM25 keyword search.
+3. **Generation:** a serverless function sends the best matches to an LLM with strict
+   instructions to answer only from them and cite each one. The API key stays on the
+   server, never in the browser.
+4. **Fallback:** if the LLM is unavailable, the site shows the matching excerpts
+   directly, so the assistant always answers.
 
-## 1. Make it yours (10 minutes)
+## Tech
 
-1. Edit `data/profile.json`: name, links, projects (`owner/repo`, plus `path` for a
-   subfolder), experience, education, skills, FAQ. `{first}` is replaced with your
-   first name.
-2. Add your resume as `assets/resume.pdf`.
-3. Preview locally:
-   ```bash
-   node scripts/build-knowledge.mjs      # warns about any template text you missed
-   python -m http.server 8000            # open http://localhost:8000
-   ```
-   Press `/` to jump to the question box.
-
-## 2. Publish on GitHub Pages (free)
-
-1. Create a public repo named `<your-username>.github.io`.
-2. Push this folder to it.
-3. In the repo, go to **Settings → Pages → Source** and choose **GitHub Actions**.
-4. The **Deploy site** workflow runs tests, rebuilds the knowledge file, and publishes to
-   `https://<your-username>.github.io`.
-
-At this point the assistant works in offline mode.
-
-## 3. Turn on the LLM (free)
-
-1. Get a free API key at https://console.groq.com (no card needed). Check the model list
-   there and keep `LLM_MODEL` in `worker/wrangler.toml` set to a model your key can use.
-2. Create a free Cloudflare account, then:
-   ```bash
-   cd worker
-   npx wrangler login
-   # edit wrangler.toml: ALLOWED_ORIGINS and KNOWLEDGE_URL use your github.io address
-   npx wrangler secret put LLM_API_KEY     # paste the Groq key
-   npx wrangler deploy                     # prints https://portfolio-chat.<you>.workers.dev
-   ```
-3. Put that URL in `data/profile.json` under `chat.endpoint`, then commit and push.
-
-Any OpenAI-compatible API works by changing `LLM_BASE_URL` and `LLM_MODEL`: Groq, Google
-Gemini, OpenRouter, or paid options like Claude later. You can set a second free provider
-as `FALLBACK_*`; it's used automatically when the first hits its daily limit. If both are
-out, visitors get offline-mode answers instead of an error.
-
-## Safety
-
-- The API key exists only as a Cloudflare secret, never in the browser or the repo.
-- The Worker only accepts requests from your site's origin, limits question length and
-  history, and the model is told to refuse anything unrelated to your portfolio.
-- Model output is rendered as text, never as HTML, so it can't inject scripts.
-- A Content Security Policy limits the page to your own files, GitHub's API, and
-  `*.workers.dev`. If you move the Worker to a custom domain, add it to `connect-src` in
-  `index.html`.
-- Free tiers without a card can't bill you; the worst case is hitting the daily limit.
-
-## Tests
-
-```bash
-npm test
-```
-
-Covers retrieval, knowledge building, safe rendering, offline answers, and the Worker
-(origin checks, validation, provider fallback, rate-limit handling).
+| Area | Choice |
+|---|---|
+| Site | HTML, CSS, and JavaScript modules, with no framework or build step |
+| Retrieval | BM25 search and markdown chunking, shared by the browser and the server |
+| LLM service | Cloudflare Worker calling an OpenAI-compatible API |
+| Live data | GitHub REST API for repo stats and recent activity |
+| Hosting | GitHub Pages, deployed by GitHub Actions |
+| Search engines | Page text, meta tags, and JSON-LD rendered into the HTML at build time |
 
 ## Structure
 
 ```
-index.html                 page shell
-assets/css/style.css       styles, light and dark
-assets/js/main.js          renders profile.json, live GitHub stats, theme
-assets/js/chat.js          the assistant UI, Worker calls, offline answers
-assets/js/retrieval.js     BM25 search + markdown chunking (shared with the Worker)
-assets/js/knowledge.js     profile.json -> knowledge chunks
-assets/js/render.js        safe answer parsing
-data/profile.json          your content (the only file you must edit)
-data/knowledge.json        generated
-scripts/build-knowledge.mjs
-worker/                    Cloudflare Worker (LLM proxy)
-tests/                     node --test
+index.html                   page shell
+assets/css/style.css         styles, light and dark themes
+assets/js/main.js            renders the profile, GitHub stats, theme
+assets/js/chat.js            assistant UI and fallback answers
+assets/js/retrieval.js       BM25 search and markdown chunking
+assets/js/knowledge.js       turns the profile into searchable chunks
+assets/js/render.js          safe rendering of answers
+data/profile.json            resume content
+scripts/build-knowledge.mjs  builds knowledge.json from the profile and repos
+scripts/prerender.mjs        writes page text and metadata into the HTML
+worker/                      serverless LLM proxy
+tests/                       unit tests (node --test)
 ```
+
+## Contact
+
+mudalgi.s@northeastern.edu · [LinkedIn](https://www.linkedin.com/in/sushant-mudalgi) · [GitHub](https://github.com/sushantm47)
