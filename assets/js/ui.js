@@ -130,7 +130,7 @@ export function copyButtons(toast) {
   });
 }
 
-// ----- the ask box docks into the nav once the hero scrolls away -----
+// ----- the ask box docks into the nav whenever its section is off screen -----
 
 export function dockAsk({ slot, ask, dock, panel }) {
   const input = ask.querySelector("input");
@@ -157,11 +157,12 @@ export function dockAsk({ slot, ask, dock, panel }) {
     if (restoreFocus && document.body.classList.contains("is-docked")) dock.focus({ preventScroll: true });
   };
 
+  // While the panel is open the ask box lives in the panel, so we watch the slot it came from.
   const io = new IntersectionObserver(([entry]) => {
-    const docked = !entry.isIntersecting && entry.boundingClientRect.top < 0;
+    const docked = !entry.isIntersecting;
     document.body.classList.toggle("is-docked", docked);
     if (!docked) closePanel({ restoreFocus: false });
-  }, { rootMargin: "-72px 0px 0px 0px" });
+  }, { rootMargin: "-72px 0px -15% 0px" });
   io.observe(slot);
 
   dock.addEventListener("click", () => (open ? closePanel() : openPanel()));
@@ -173,15 +174,10 @@ export function dockAsk({ slot, ask, dock, panel }) {
     if (open && !panel.contains(e.target) && !dock.contains(e.target)) closePanel({ restoreFocus: false });
   });
 
-  // Focus the right box: the hero box at the top of the page, the docked panel further down.
-  return {
-    focus() {
-      if (document.body.classList.contains("is-docked")) openPanel();
-      else input.focus();
-    },
-    reveal() {
-      if (document.body.classList.contains("is-docked")) openPanel();
-      else slot.scrollIntoView({ behavior: reducedMotion() ? "auto" : "smooth", block: "center" });
-    },
+  // Use the section when it's on screen, otherwise the docked panel. Never scroll the page.
+  const focus = () => {
+    if (document.body.classList.contains("is-docked")) openPanel();
+    else input.focus({ preventScroll: true });
   };
+  return { focus, reveal: focus };
 }

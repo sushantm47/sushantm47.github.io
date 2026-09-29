@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-09-29T02:50:09.833Z",
+ "generated_at": "2026-09-29T03:04:19.946Z",
  "owner": {
   "name": "Sushant Mudalgi",
   "first": "Sushant",
@@ -60,28 +60,28 @@
    "title": "Experience: Data Engineer L4 at Takeda",
    "source": "profile",
    "url": "",
-   "text": "Data Engineer L4 at Takeda (Bengaluru, India), May 2025 to Aug 2025.\nJoined Takeda directly after supporting its data engineering team through EY.\nDeveloped and maintained 15+ production PySpark pipelines on Databricks across North America and Europe, powering analytics and regulatory reporting under strict data-compliance requirements.\nBuilt secure data ingestion with Databricks Unity Catalog and AWS (S3, DMS, Step Functions, Lambda), including scheduled snapshot delivery from Databricks Delta Marketplace so downstream teams always had fresh data."
+   "text": "Data Engineer L4 at Takeda (Bengaluru, India), May 2025 to Aug 2025.\nMaintained 15+ production PySpark pipelines on Databricks behind regulatory reporting across North America and Europe.\nJoined Takeda directly after supporting its data engineering team through EY.\nDeveloped and maintained 15+ production PySpark pipelines on Databricks across North America and Europe, powering analytics and regulatory reporting under strict data-compliance requirements.\nBuilt secure data ingestion with Databricks Unity Catalog and AWS (S3, DMS, Step Functions, Lambda), including scheduled snapshot delivery from Databricks Delta Marketplace so downstream teams always had fresh data.\nTools: PySpark, Databricks, Unity Catalog, AWS."
   },
   {
    "id": "profile#experience-ey-gds-Nov 2024",
    "title": "Experience: Data Engineer at EY GDS",
    "source": "profile",
    "url": "",
-   "text": "Data Engineer at EY GDS (Bengaluru, India), Nov 2024 to Apr 2025.\nImplemented 15 real-time and batch PySpark pipelines processing 200 to 300 GB from SQL Server, SFTP, SharePoint, Heroku, and third-party vendors, in modular, object-oriented Python.\nDesigned 30+ Delta Lake tables for fast queries and pharmaceutical reporting, with ingestion automated through AWS DMS, EventBridge, Step Functions, and S3.\nMigrated orchestration from AWS Step Functions to Tidal, cutting workflow costs by 25% and scheduling 10+ Databricks workflows with clearer job dependencies."
+   "text": "Data Engineer at EY GDS (Bengaluru, India), Nov 2024 to Apr 2025.\nBuilt 15 real-time and batch pipelines processing 200 to 300 GB, and cut workflow costs 25% by migrating orchestration.\nImplemented 15 real-time and batch PySpark pipelines processing 200 to 300 GB from SQL Server, SFTP, SharePoint, Heroku, and third-party vendors, in modular, object-oriented Python.\nDesigned 30+ Delta Lake tables for fast queries and pharmaceutical reporting, with ingestion automated through AWS DMS, EventBridge, Step Functions, and S3.\nMigrated orchestration from AWS Step Functions to Tidal, cutting workflow costs by 25% and scheduling 10+ Databricks workflows with clearer job dependencies.\nTools: PySpark, Delta Lake, AWS, Tidal."
   },
   {
    "id": "profile#experience-deloitte-usi-Sep 2021",
    "title": "Experience: Software Engineering Analyst at Deloitte USI",
    "source": "profile",
    "url": "",
-   "text": "Software Engineering Analyst at Deloitte USI (Bengaluru, India), Sep 2021 to Nov 2024.\nDesigned fact and dimension tables in Amazon Redshift and connected the warehouse to Tableau, delivering data models and dashboards for enterprise reporting.\nBuilt ETL jobs in Talend and AWS Glue with reusable, object-oriented Python transformations, and led the migration of Talend jobs to AWS Glue.\nApplied machine learning (K-Means, Mean Shift, linear regression, XGBoost) in Python to surface business insights from transactional data."
+   "text": "Software Engineering Analyst at Deloitte USI (Bengaluru, India), Sep 2021 to Nov 2024.\nDesigned Redshift data models and Tableau dashboards, and led the migration of Talend ETL jobs to AWS Glue.\nDesigned fact and dimension tables in Amazon Redshift and connected the warehouse to Tableau, delivering data models and dashboards for enterprise reporting.\nBuilt ETL jobs in Talend and AWS Glue with reusable, object-oriented Python transformations, and led the migration of Talend jobs to AWS Glue.\nApplied machine learning (K-Means, Mean Shift, linear regression, XGBoost) in Python to surface business insights from transactional data.\nTools: Redshift, AWS Glue, Talend, Tableau."
   },
   {
    "id": "profile#experience-kalpas-innovations-Mar 2021",
    "title": "Experience: Software Engineering Intern, Web Development at Kalpas Innovations",
    "source": "profile",
    "url": "",
-   "text": "Software Engineering Intern, Web Development at Kalpas Innovations (Hubli, India), Mar 2021 to Jul 2021.\nBuilt the React.js front end of a digital platform with real-time interactions for 5,000+ monthly active users, backed by a MongoDB document store."
+   "text": "Software Engineering Intern, Web Development at Kalpas Innovations (Hubli, India), Mar 2021 to Jul 2021.\nBuilt the React.js front end of a platform with 5,000+ monthly active users.\nBuilt the React.js front end of a digital platform with real-time interactions for 5,000+ monthly active users, backed by a MongoDB document store.\nTools: React.js, MongoDB."
   },
   {
    "id": "profile#education-northeastern-university-khoury-college",

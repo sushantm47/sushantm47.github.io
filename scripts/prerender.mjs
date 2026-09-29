@@ -76,16 +76,14 @@ export function headlineHtml(p) {
 }
 
 export function heroHtml(p) {
-  const stats = (p.stats || [])
-    .map((st) => `<div><dt>${escapeHtml(st.value)}</dt><dd>${escapeHtml(st.label)}</dd></div>`)
-    .join("");
   const previously = previouslyHtml(p);
+  const grad = p.education?.[0]?.end;
+  const availability = [p.availability, grad && `graduating ${grad}`].filter(Boolean).join(", ");
   return [
-    `<p class="hero-hello" data-text="greeting">${escapeHtml(fill(p.greeting || p.name, p))}</p>`,
+    `<p class="avail"${availability ? "" : " hidden"}><span class="pulse" aria-hidden="true"></span><span id="availability">${escapeHtml(availability)}</span></p>`,
     `        <h1 id="headline">${headlineHtml(p)}</h1>`,
-    `        <p class="hero-intro" data-text="intro">${escapeHtml(fill(p.intro, p))}</p>`,
+    `        <p class="hero-intro" data-text="tagline">${escapeHtml(fill(p.tagline || p.intro, p))}</p>`,
     `        <p class="hero-previously" id="previously"${previously ? "" : " hidden"}>${previously}</p>`,
-    `        <dl class="stats" id="stats"${stats ? "" : " hidden"}>${stats}</dl>`,
   ].join("\n");
 }
 

@@ -113,7 +113,8 @@
         "result": "1.000 hit@5 and 1.000 MRR on a golden dataset with hybrid search, versus 0.909 MRR for either method alone, enforced as a CI quality gate. 65+ automated tests cover the agent, guardrails, and retrieval, and the AWS infrastructure is defined as code with CDK."
       },
       "color": "#F5A524",
-      "art": "flow"
+      "art": "flow",
+      "tagline": "An AI copilot that diagnoses production alerts and cites its evidence."
     },
     {
       "name": "DealRadar",
@@ -168,7 +169,8 @@
         "result": "A working full-stack app: Flask backend, a MySQL schema with triggers and stored procedures, a resilient scraper, and an interactive price-history dashboard."
       },
       "color": "#3DD68C",
-      "art": "chart"
+      "art": "chart",
+      "tagline": "A price tracker that charts Amazon price history and flags deals."
     },
     {
       "name": "DNS simulation",
@@ -182,7 +184,8 @@
       ],
       "featured": false,
       "color": "#2DD4BF",
-      "art": "network"
+      "art": "network",
+      "tagline": "A local DNS resolver simulation built with Python sockets."
     },
     {
       "name": "COVID-19 tracker",
@@ -196,7 +199,8 @@
       ],
       "featured": false,
       "color": "#FB7185",
-      "art": "globe"
+      "art": "globe",
+      "tagline": "A React dashboard of live COVID-19 counts, globally and by country."
     }
   ],
   "experience": [
@@ -210,6 +214,13 @@
         "Joined Takeda directly after supporting its data engineering team through EY.",
         "Developed and maintained 15+ production PySpark pipelines on Databricks across North America and Europe, powering analytics and regulatory reporting under strict data-compliance requirements.",
         "Built secure data ingestion with Databricks Unity Catalog and AWS (S3, DMS, Step Functions, Lambda), including scheduled snapshot delivery from Databricks Delta Marketplace so downstream teams always had fresh data."
+      ],
+      "summary": "Maintained 15+ production PySpark pipelines on Databricks behind regulatory reporting across North America and Europe.",
+      "tags": [
+        "PySpark",
+        "Databricks",
+        "Unity Catalog",
+        "AWS"
       ]
     },
     {
@@ -222,6 +233,13 @@
         "Implemented 15 real-time and batch PySpark pipelines processing 200 to 300 GB from SQL Server, SFTP, SharePoint, Heroku, and third-party vendors, in modular, object-oriented Python.",
         "Designed 30+ Delta Lake tables for fast queries and pharmaceutical reporting, with ingestion automated through AWS DMS, EventBridge, Step Functions, and S3.",
         "Migrated orchestration from AWS Step Functions to Tidal, cutting workflow costs by 25% and scheduling 10+ Databricks workflows with clearer job dependencies."
+      ],
+      "summary": "Built 15 real-time and batch pipelines processing 200 to 300 GB, and cut workflow costs 25% by migrating orchestration.",
+      "tags": [
+        "PySpark",
+        "Delta Lake",
+        "AWS",
+        "Tidal"
       ]
     },
     {
@@ -234,6 +252,13 @@
         "Designed fact and dimension tables in Amazon Redshift and connected the warehouse to Tableau, delivering data models and dashboards for enterprise reporting.",
         "Built ETL jobs in Talend and AWS Glue with reusable, object-oriented Python transformations, and led the migration of Talend jobs to AWS Glue.",
         "Applied machine learning (K-Means, Mean Shift, linear regression, XGBoost) in Python to surface business insights from transactional data."
+      ],
+      "summary": "Designed Redshift data models and Tableau dashboards, and led the migration of Talend ETL jobs to AWS Glue.",
+      "tags": [
+        "Redshift",
+        "AWS Glue",
+        "Talend",
+        "Tableau"
       ]
     },
     {
@@ -244,6 +269,11 @@
       "end": "Jul 2021",
       "points": [
         "Built the React.js front end of a digital platform with real-time interactions for 5,000+ monthly active users, backed by a MongoDB document store."
+      ],
+      "summary": "Built the React.js front end of a platform with 5,000+ monthly active users.",
+      "tags": [
+        "React.js",
+        "MongoDB"
       ]
     }
   ],
@@ -350,13 +380,5 @@
   "greeting": "Hey, I'm {first}",
   "headline_accent": "dependable",
   "availability": "Open to co-op and full-time roles",
-  "card_tags": [
-    "Python",
-    "SQL",
-    "PySpark",
-    "AWS",
-    "Databricks",
-    "FastAPI",
-    "RAG"
-  ]
+  "tagline": "Software engineer and MS in Computer Science student at Northeastern, with four years of industry experience across data platforms, backend services, and applied AI."
 }

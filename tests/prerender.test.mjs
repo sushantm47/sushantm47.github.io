@@ -16,9 +16,9 @@ test("head tags carry the name, description, canonical URL, and valid JSON-LD", 
 
 test("text is escaped so profile content can't break the page", () => {
   assert.equal(escapeHtml('<b>"x" & y</b>'), "&lt;b&gt;&quot;x&quot; &amp; y&lt;/b&gt;");
-  const evil = { ...profile, name: "</script><script>alert(1)</script>" };
+  const evil = { ...profile, name: "</script><script>alert(1)</script>", headline: "<img src=x onerror=alert(1)>" };
   assert.ok(!headTags(evil).includes("</script><script>"));
-  assert.ok(heroHtml(evil).includes("&lt;/script&gt;"));
+  assert.ok(heroHtml(evil).includes("&lt;img src=x onerror=alert(1)&gt;"));
 });
 
 test("description fits a search snippet", () => {

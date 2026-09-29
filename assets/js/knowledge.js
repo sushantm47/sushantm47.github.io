@@ -74,7 +74,14 @@ export function profileToChunks(profile) {
     add(
       `experience-${slug(e.org)}-${e.start}`,
       `Experience: ${e.role} at ${e.org}`,
-      `${e.role} at ${e.org}${e.location ? ` (${e.location})` : ""}, ${e.start} to ${e.end}.\n${(e.points || []).join("\n")}`
+      [
+        `${e.role} at ${e.org}${e.location ? ` (${e.location})` : ""}, ${e.start} to ${e.end}.`,
+        e.summary,
+        ...(e.points || []),
+        e.tags?.length && `Tools: ${e.tags.join(", ")}.`,
+      ]
+        .filter(Boolean)
+        .join("\n")
     );
   }
 

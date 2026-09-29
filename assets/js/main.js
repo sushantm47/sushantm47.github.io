@@ -1,7 +1,6 @@
 import { artSvg } from "./art.js";
 import { initChat } from "./chat.js";
 import {
-  anchorFor,
   employers,
   experienceAnchor,
   fill,
@@ -9,7 +8,6 @@ import {
   headlineParts,
   projectAnchor,
   repoUrl,
-  skillGroups,
 } from "./knowledge.js";
 import { splitNumbers } from "./render.js";
 import { copyButtons, countUp, dockAsk, progressBar, reveal, scrollSpy, whenNear } from "./ui.js";
@@ -23,6 +21,7 @@ async function main() {
   renderProfile(profile);
 
   const chat = await initChat(profile, document.getElementById("ask"));
+  // (the ask box lives in its own section; it docks into the nav when that section is off screen)
   const dock = dockAsk({
     slot: document.getElementById("ask-slot"),
     ask: document.getElementById("ask"),
@@ -48,8 +47,8 @@ async function main() {
   copyButtons(document.getElementById("toast"));
 
   // Lazy loading: GitHub data is fetched only when its section is about to be seen.
-  whenNear(document.getElementById("tiles"), () => loadRepoStats(profile));
-  whenNear(document.getElementById("github"), () => loadRecentRepos(profile));
+  // Lazy loading: other public repos are fetched only when "More projects" is about to be seen.
+  whenNear(document.querySelector(".more"), () => loadMoreRepos(profile));
 }
 
 function el(tag, attrs = {}, ...children) {
@@ -71,14 +70,13 @@ function renderProfile(p) {
   const links = p.links || {};
   document.title = `${p.name}, ${p.role}`;
   for (const node of document.querySelectorAll("[data-name]")) node.textContent = p.name;
-  setText("role", p.role);
-  setText("greeting", f(p.greeting || p.name));
-  setText("intro", f(p.intro));
+  setText("tagline", f(p.tagline || p.intro));
   setText("status", f(p.status));
-  setText("availability", p.availability);
   setText("location", p.location);
-  setText("graduating", p.education?.[0]?.end || "");
   setText("email-text", links.email);
+  const grad = p.education?.[0]?.end;
+  const availability = document.getElementById("availability");
+  if (availability) availability.textContent = [p.availability, grad && `graduating ${grad}`].filter(Boolean).join(", ");
   renderHeadline(p);
   renderPreviously(p);
   renderStats(p);
@@ -89,54 +87,44 @@ function renderProfile(p) {
   setHref("email", `mailto:${links.email}`);
   for (const b of document.querySelectorAll("[data-copy-email]")) b.dataset.copy = links.email;
 
-  const tags = document.getElementById("card-tags");
-  for (const t of p.card_tags || []) tags.append(el("li", { text: t }));
-
-  const tiles = document.getElementById("tiles");
   const projects = p.projects || [];
-  let caseNumber = 0;
-  projects.forEach((project, i) => {
-    const featured = project.featured !== false;
-    tiles.append(tile(project, featured ? ++caseNumber : 0, i, f));
-  });
+  const tiles = document.getElementById("tiles");
+  projects.filter((x) => x.featured !== false).forEach((project, i) => tiles.append(tile(project, i + 1, f)));
+  const more = document.getElementById("more-list");
+  for (const project of projects.filter((x) => x.featured === false)) {
+    more.append(moreRow({ name: project.name, text: f(project.tagline || project.summary), tags: project.stack, url: repoUrl(project), repo: project.repo }));
+  }
   initCaseDialog(p, f);
 
-  const timeline = document.getElementById("experience-list");
-  const rows = [
-    ...(p.experience || []).map((e) => ({
-      id: experienceAnchor(e.org), title: e.role, org: e.org, when: `${e.start} to ${e.end}`,
-      where: e.location, points: e.points || [],
-    })),
-    ...(p.education || []).map((ed) => ({
-      title: ed.degree, org: ed.school, when: `${ed.start} to ${ed.end}`, points: ed.notes ? [ed.notes] : [],
-    })),
-  ];
-  rows.forEach((r, i) => {
-    const item = el("li", { id: r.id, "data-reveal": "" },
-      el("div", { class: "tl-head" },
-        el("h3", {}, r.title, el("span", { class: "tl-org", text: ` at ${r.org}` })),
-        el("p", { class: "tl-when", text: r.when })),
-      r.where && el("p", { class: "tl-where", text: r.where }),
-      r.points.length > 1
-        ? el("ul", {}, ...r.points.map((pt) => withNumbers(el("li"), f(pt))))
-        : r.points.length && withNumbers(el("p", { class: "tl-note" }), f(r.points[0])));
+  const roles = document.getElementById("roles");
+  (p.experience || []).forEach((e, i) => {
+    const item = el("li", { id: experienceAnchor(e.org), class: "role", "data-reveal": "" },
+      el("div", { class: "role-head" },
+        el("h3", {}, e.role, el("span", { class: "role-org", text: ` at ${e.org}` })),
+        el("p", { class: "role-when", text: `${e.start} to ${e.end}` })),
+      withNumbers(el("p", { class: "role-summary" }), f(e.summary || e.points?.[0] || "")),
+      e.tags?.length && el("ul", { class: "tags tags-sm" }, ...e.tags.map((t) => el("li", { text: t }))),
+      e.points?.length > 0 && el("details", { class: "role-more" },
+        el("summary", { text: "More" }),
+        el("ul", {}, ...e.points.map((pt) => withNumbers(el("li"), f(pt))))));
     stagger(item, i);
-    timeline.append(item);
+    roles.append(item);
   });
 
-  const skills = document.getElementById("skills-list");
-  skillGroups(p).forEach((g, i) => {
-    const used = (g.used_in || []).map((name) => {
-      const href = anchorFor(name, p);
-      return href ? el("a", { href, text: name }) : document.createTextNode(name);
-    });
-    const card = el("div", { class: "skill-group", "data-reveal": "" },
-      el("h3", { text: g.group }),
-      el("ul", { class: "tags" }, ...g.items.map((item) => el("li", { text: item }))),
-      used.length && el("p", { class: "skill-used" }, "Used at and in ", ...interleave(used)));
-    stagger(card, i);
-    skills.append(card);
-  });
+  const edu = document.getElementById("edu-list");
+  for (const ed of p.education || []) {
+    const gpa = /GPA [\d.]+ \/ [\d.]+/.exec(ed.notes || "")?.[0];
+    edu.append(el("li", {},
+      el("strong", { text: ed.degree }), `, ${ed.school}`,
+      el("span", { class: "edu-meta", text: [`${ed.start} to ${ed.end}`, gpa].filter(Boolean).join(", ") })));
+  }
+}
+
+function moreRow({ name, text, tags, url, repo }) {
+  return el("li", { "data-repo": repo || "", "data-reveal": "" },
+    el("a", { class: "more-name", href: url, target: "_blank", rel: "noopener", text: name }),
+    el("p", { text }),
+    tags?.length && el("ul", { class: "tags tags-sm" }, ...tags.slice(0, 3).map((t) => el("li", { text: t }))));
 }
 
 function renderHeadline(p) {
@@ -162,38 +150,28 @@ function renderStats(p) {
 
 // ----- project tiles and case studies -----
 
-function tile(project, caseNumber, index, f) {
-  const hasCase = Boolean(project.case_study);
+function tile(project, caseNumber, f) {
   const art = el("div", { class: "tile-art" });
   art.innerHTML = artSvg(project.art); // static, trusted markup from art.js
-
-  const open = hasCase
-    ? el("button", { type: "button", class: "tile-hit", "data-case": project.name, "aria-label": `Read the ${project.name} case study` }, art)
-    : el("a", { class: "tile-hit", href: repoUrl(project), target: "_blank", rel: "noopener", "aria-label": `${project.name} on GitHub` }, art);
-
-  const ask = el("button", { type: "button", class: "text-link", text: "Ask about this" });
-  ask.addEventListener("click", () =>
-    document.dispatchEvent(new CustomEvent("portfolio:ask", { detail: `Tell me about ${project.name}: the problem, the approach, and the result.` })));
-
-  const node = el("article", {
-    class: hasCase ? "tile tile-lg" : "tile",
+  const node = el(project.case_study ? "button" : "a", {
+    class: "tile",
     id: projectAnchor(project.name),
     "data-repo": project.repo,
     "data-reveal": "",
+    ...(project.case_study
+      ? { type: "button", "data-case": project.name, "aria-label": `${project.name}: read the case study` }
+      : { href: repoUrl(project), target: "_blank", rel: "noopener" }),
   },
-    open,
-    el("div", { class: "tile-body" },
-      el("p", { class: "tile-kicker", text: caseNumber ? `Case study ${String(caseNumber).padStart(2, "0")}` : "Project" }),
-      el("h3", { text: project.name }),
-      el("p", { class: "tile-summary", text: f(project.summary) }),
-      el("ul", { class: "tags tags-sm" }, ...(project.stack || []).map((s) => el("li", { text: s }))),
-      el("p", { class: "tile-links" },
-        hasCase && el("button", { type: "button", class: "text-link strong", "data-case": project.name, text: "Read case study" }),
-        el("a", { class: "text-link", href: repoUrl(project), target: "_blank", rel: "noopener", text: "Code" }),
-        ask),
-      el("p", { class: "project-stats", "data-stats": "" })));
+    art,
+    el("span", { class: "tile-body" },
+      el("span", { class: "tile-kicker", text: `Case study ${String(caseNumber).padStart(2, "0")}` }),
+      el("span", { class: "tile-title", text: project.name }),
+      el("span", { class: "tile-summary", text: f(project.tagline || project.summary) }),
+      el("span", { class: "tile-foot" },
+        el("span", { class: "tile-tags", text: (project.stack || []).slice(0, 3).join(", ") }),
+        el("span", { class: "tile-cta", text: project.case_study ? "Read case study" : "View code" }))));
   node.style.setProperty("--tile", project.color || "#F4C95D");
-  stagger(node, index);
+  stagger(node, caseNumber - 1);
   return node;
 }
 
@@ -310,46 +288,21 @@ function githubUser(profile) {
   return user && user !== PLACEHOLDER_USER ? user : null;
 }
 
-async function loadRepoStats(profile) {
-  if (!githubUser(profile)) return;
-  const repos = [...new Set((profile.projects || []).map((p) => p.repo))];
-  await Promise.all(repos.map(async (repo) => {
-    try {
-      const r = await gh(`/repos/${repo}`);
-      // Language and stars only: "updated 5 years ago" would make older projects look abandoned.
-      const text = [r.language, r.stargazers_count > 0 && `${r.stargazers_count} ${r.stargazers_count === 1 ? "star" : "stars"}`]
-        .filter(Boolean).join(", ");
-      for (const node of document.querySelectorAll(`[data-repo="${repo}"] [data-stats]`)) node.textContent = text;
-    } catch { /* stats are optional */ }
-  }));
-}
-
-async function loadRecentRepos(profile) {
+// Adds your other public repos (newest first) to "More projects".
+async function loadMoreRepos(profile) {
   const user = githubUser(profile);
-  const section = document.getElementById("github");
-  if (!user) {
-    section.hidden = true;
-    return;
-  }
+  if (!user) return;
   try {
     const shown = new Set((profile.projects || []).map((p) => p.repo.toLowerCase()));
     const list = await gh(`/users/${user}/repos?sort=pushed&per_page=12`);
-    const target = document.getElementById("github-list");
-    const fresh = list.filter((x) => !x.fork && !x.archived && !shown.has(x.full_name.toLowerCase())
-      && x.name.toLowerCase() !== `${user}.github.io`.toLowerCase());
-    fresh.slice(0, 6).forEach((r, i) => {
-      const card = el("li", { "data-reveal": "" },
-        el("a", { href: r.html_url, target: "_blank", rel: "noopener", text: r.name }),
-        el("p", { text: r.description || "No description yet." }),
-        r.language && el("p", { class: "meta", text: r.language }));
-      stagger(card, i);
-      target.append(card);
-    });
-    if (!target.children.length) section.hidden = true;
+    const target = document.getElementById("more-list");
+    const extra = list.filter((x) => !x.fork && !x.archived && !shown.has(x.full_name.toLowerCase())
+      && x.name.toLowerCase() !== `${user}.github.io`.toLowerCase() && x.description);
+    for (const r of extra.slice(0, 4)) {
+      target.append(moreRow({ name: r.name, text: r.description, tags: r.language ? [r.language] : [], url: r.html_url, repo: r.full_name }));
+    }
     reveal(target);
-  } catch {
-    section.hidden = true;
-  }
+  } catch { /* the curated projects are enough */ }
 }
 
 export function relativeTime(iso, now = Date.now()) {
