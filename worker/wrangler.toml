@@ -1,0 +1,26 @@
+# Cloudflare Worker for the portfolio chat. Deploy: npx wrangler deploy
+name = "portfolio-chat"
+main = "src/index.js"
+compatibility_date = "2026-09-01"
+
+[vars]
+# Your GitHub Pages site, exactly as the browser shows it (no trailing slash).
+ALLOWED_ORIGINS = "https://sushantm47.github.io"
+KNOWLEDGE_URL = "https://sushantm47.github.io/data/knowledge.json"
+# Any OpenAI-compatible API works. Groq is the default; check its current free model list.
+LLM_BASE_URL = "https://api.groq.com/openai/v1"
+LLM_MODEL = "openai/gpt-oss-20b"
+# Optional second free provider, used when the first hits its daily limit, e.g. Gemini
+# (copy the exact model name from Google AI Studio):
+# FALLBACK_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/openai"
+# FALLBACK_MODEL = "gemini-flash-lite-latest"
+
+# Secrets are set with the CLI and never committed:
+#   npx wrangler secret put LLM_API_KEY
+#   npx wrangler secret put FALLBACK_API_KEY   (optional)
+
+# Optional per-visitor rate limit (10 questions per minute per IP). Uncomment to enable.
+# [[ratelimits]]
+# name = "CHAT_LIMITER"
+# namespace_id = "1001"
+# simple = { limit = 10, period = 60 }

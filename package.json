@@ -1,0 +1,14 @@
+{
+  "name": "portfolio",
+  "private": true,
+  "type": "module",
+  "description": "Portfolio site with a free, repo-grounded AI assistant",
+  "scripts": {
+    "test": "node --test",
+    "build:knowledge": "node scripts/build-knowledge.mjs",
+    "build:knowledge:offline": "node scripts/build-knowledge.mjs --offline",
+    "prerender": "node scripts/prerender.mjs",
+    "serve": "python3 -m http.server 8000"
+  },
+  "engines": { "node": ">=20" }
+}
