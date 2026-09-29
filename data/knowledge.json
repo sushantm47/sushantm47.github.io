@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-09-29T02:06:51.956Z",
+ "generated_at": "2026-09-29T02:50:09.833Z",
  "owner": {
   "name": "Sushant Mudalgi",
   "first": "Sushant",
@@ -11,7 +11,7 @@
    "title": "About Sushant Mudalgi",
    "source": "profile",
    "url": "",
-   "text": "Sushant Mudalgi: Software engineer. I build dependable software, from data pipelines to APIs to AI agents.\nMS in Computer Science student at Northeastern with four years of industry experience. I've shipped production pipelines behind regulatory reporting, warehouses and dashboards for business teams, web front ends, and an AI incident-response agent that cites its evidence.\nPreviously at Takeda, EY, and Deloitte.\n4 years of industry experience.\n15+ production pipelines maintained at Takeda.\n200–300 GB processed by pipelines I built at EY.\n25% workflow cost cut by an orchestration migration.\nLocation: Boston, MA.\nCurrently: Open to software engineering, data engineering, and AI engineering roles, including co-op and full-time positions. I graduate in May 2027.\nContact: email mudalgi.s@northeastern.edu; GitHub https://github.com/sushantm47; LinkedIn https://www.linkedin.com/in/sushant-mudalgi."
+   "text": "Sushant Mudalgi: Software engineer. I build dependable software, from data pipelines to APIs to AI agents.\nMS in Computer Science student at Northeastern with four years of industry experience. I've shipped production pipelines behind regulatory reporting, warehouses and dashboards for business teams, web front ends, and an AI incident-response agent that cites its evidence.\nPreviously at Takeda, EY, and Deloitte.\nAvailability: Open to co-op and full-time roles.\n4 years of industry experience.\n15+ production pipelines maintained at Takeda.\n200+ GB processed by pipelines I built at EY.\n25% workflow cost cut by an orchestration migration.\nLocation: Boston, MA.\nCurrently: Open to software engineering, data engineering, and AI engineering roles, including co-op and full-time positions. I graduate in May 2027.\nContact: email mudalgi.s@northeastern.edu; GitHub https://github.com/sushantm47; LinkedIn https://www.linkedin.com/in/sushant-mudalgi."
   },
   {
    "id": "profile#project-opspilot",
@@ -99,7 +99,7 @@
   },
   {
    "id": "profile#skills",
-   "title": "Skills of Sushant Mudalgi",
+   "title": "Skills",
    "source": "profile",
    "url": "",
    "text": "Languages: Python, SQL, Java, JavaScript, PySpark. Used at or in: Takeda, EY GDS, and OpsPilot.\nBackend and web: FastAPI, REST APIs, Flask, React.js, PostgreSQL, MySQL, MongoDB, Docker, Git and GitHub, CI/CD (Jenkins, GitHub Actions). Used at or in: OpsPilot, DealRadar, and Kalpas Innovations.\nData and cloud: Databricks (Delta Lake, Unity Catalog), Spark, AWS (S3, Glue, Redshift, Lambda, DMS, EventBridge, Step Functions), Snowflake, Airflow, Tidal, Talend, Tableau. Used at or in: Takeda, EY GDS, and Deloitte USI.\nAI and ML: RAG and hybrid search, LLM agents, tool use, and MCP, Evals and guardrails, scikit-learn, XGBoost, Pandas and NumPy. Used at or in: OpsPilot and Deloitte USI."

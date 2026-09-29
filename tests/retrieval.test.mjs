@@ -30,3 +30,12 @@ test("chunkMarkdown scopes chunks by heading and skips code fences", () => {
   assert.deepEqual(out.map((c) => c.title), ["Repo: Title", "Repo: Run"]);
   assert.ok(out[1].text.includes("# not a heading"));
 });
+
+test("ignored terms (like the owner's name) don't drive ranking", () => {
+  const index = buildIndex([
+    { id: "about", title: "About Ada Lovelace", text: "Ada Lovelace, engineer." },
+    { id: "ey", title: "Experience: Data Engineer at EY", text: "Built pipelines at EY." },
+  ]);
+  assert.equal(search(index, "What did Ada Lovelace do at EY?", 1, { ignore: ["Ada Lovelace"] })[0].chunk.id, "ey");
+  assert.deepEqual(search(index, "Ada Lovelace", 3, { ignore: ["Ada Lovelace"] }), []);
+});

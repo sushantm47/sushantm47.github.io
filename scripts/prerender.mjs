@@ -3,8 +3,9 @@
 // so search engines and link previews see real text without running JavaScript.
 // Usage: node scripts/prerender.mjs
 
-import { readFile, writeFile } from "node:fs/promises";
-import { fill, githubUrl, joinList, skillGroups } from "../assets/js/knowledge.js";
+import { createHash } from "node:crypto";
+import { readdir, readFile, writeFile } from "node:fs/promises";
+import { employers, fill, githubUrl, headlineParts, skillGroups } from "../assets/js/knowledge.js";
 
 export function escapeHtml(text) {
   return String(text ?? "")
@@ -54,17 +55,37 @@ export function headTags(p) {
     .join("\n  ");
 }
 
+export function previouslyHtml(p) {
+  const list = employers(p).map((e) =>
+    e.url
+      ? `<a href="${escapeHtml(e.url)}" target="_blank" rel="noopener">${escapeHtml(e.name)}</a>`
+      : escapeHtml(e.name)
+  );
+  if (!list.length) return "";
+  const joined =
+    list.length === 1 ? list[0]
+      : list.length === 2 ? `${list[0]} and ${list[1]}`
+        : `${list.slice(0, -1).join(", ")}, and ${list.at(-1)}`;
+  return `Previously at ${joined}`;
+}
+
+export function headlineHtml(p) {
+  return headlineParts(fill(p.headline, p), p.headline_accent)
+    .map((part) => (part.accent ? `<span class="accent">${escapeHtml(part.text)}</span>` : escapeHtml(part.text)))
+    .join("");
+}
+
 export function heroHtml(p) {
-  const previously = p.previously?.length ? `Previously at ${joinList(p.previously)}` : "";
   const stats = (p.stats || [])
     .map((st) => `<div><dt>${escapeHtml(st.value)}</dt><dd>${escapeHtml(st.label)}</dd></div>`)
     .join("");
+  const previously = previouslyHtml(p);
   return [
-    `<p class="hero-who"><span data-name>${escapeHtml(p.name)}</span>, <span data-text="role">${escapeHtml(p.role)}</span></p>`,
-    `      <h1 id="headline" data-text="headline">${escapeHtml(fill(p.headline, p))}</h1>`,
-    `      <p class="hero-intro" data-text="intro">${escapeHtml(fill(p.intro, p))}</p>`,
-    `      <p class="hero-previously" data-text="previously"${previously ? "" : " hidden"}>${escapeHtml(previously)}</p>`,
-    `      <dl class="stats" id="stats"${stats ? "" : " hidden"}>${stats}</dl>`,
+    `<p class="hero-hello" data-text="greeting">${escapeHtml(fill(p.greeting || p.name, p))}</p>`,
+    `        <h1 id="headline">${headlineHtml(p)}</h1>`,
+    `        <p class="hero-intro" data-text="intro">${escapeHtml(fill(p.intro, p))}</p>`,
+    `        <p class="hero-previously" id="previously"${previously ? "" : " hidden"}>${previously}</p>`,
+    `        <dl class="stats" id="stats"${stats ? "" : " hidden"}>${stats}</dl>`,
   ].join("\n");
 }
 
@@ -82,13 +103,41 @@ export function sitemap(url, date = new Date()) {
 `;
 }
 
+// Cache busting: GitHub Pages lets browsers keep files for ~10 minutes. Without a version
+// stamp, a returning visitor can get new HTML/data with old JS and CSS, and the page breaks.
+// Every asset URL and every relative module import gets "?v=<content hash>".
+export function stampHtml(html, version) {
+  return html.replace(/(assets\/(?:css|js)\/[\w.-]+\.(?:css|js))(?:\?v=[\w]+)?/g, `$1?v=${version}`);
+}
+
+export function stampImports(js, version) {
+  return js.replace(/(from\s+["'])(\.{1,2}\/[\w./-]+\.js)(?:\?v=[\w]+)?(["'])/g, `$1$2?v=${version}$3`);
+}
+
+export async function assetVersion(root, files) {
+  const hash = createHash("sha256");
+  for (const file of files.sort()) hash.update(await readFile(new URL(file, root)));
+  return hash.digest("hex").slice(0, 10);
+}
+
 async function main() {
   const root = new URL("../", import.meta.url);
   const profile = JSON.parse(await readFile(new URL("data/profile.json", root), "utf8"));
   let html = await readFile(new URL("index.html", root), "utf8");
   html = replaceBlock(html, "head", headTags(profile));
   html = replaceBlock(html, "hero", heroHtml(profile));
-  html = html.replace(/(<a class="bar-name"[^>]*>)[^<]*(<\/a>)/, `$1${escapeHtml(profile.name)}$2`);
+
+  if (process.argv.includes("--bust")) {
+    const jsFiles = (await readdir(new URL("assets/js/", root))).filter((f) => f.endsWith(".js"));
+    const files = ["assets/css/style.css", ...jsFiles.map((f) => `assets/js/${f}`)];
+    const version = await assetVersion(root, files);
+    html = stampHtml(html, version);
+    for (const f of jsFiles) {
+      const url = new URL(`assets/js/${f}`, root);
+      await writeFile(url, stampImports(await readFile(url, "utf8"), version));
+    }
+    console.log(`Stamped assets with version ${version}.`);
+  }
   await writeFile(new URL("index.html", root), html);
 
   if (profile.site_url) {

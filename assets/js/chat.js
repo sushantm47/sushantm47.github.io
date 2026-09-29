@@ -15,7 +15,14 @@ export async function initChat(profile, root) {
   const chips = root.querySelector("[data-suggestions]");
   const endpoint = (profile.chat?.endpoint || "").trim();
   const history = [];
-  const index = buildIndex(await loadChunks(profile));
+
+  // Lazy loading: the knowledge file is only downloaded once someone shows interest in the
+  // assistant (hover, focus, or a question), not on page load.
+  let indexPromise = null;
+  const getIndex = () => (indexPromise ??= loadChunks(profile).then(buildIndex));
+  for (const type of ["pointerenter", "focusin", "touchstart"]) {
+    root.addEventListener(type, getIndex, { once: true, passive: true });
+  }
 
   note.textContent = endpoint
     ? "Answers are written from my repos and resume, and list their sources."
@@ -33,10 +40,6 @@ export async function initChat(profile, root) {
     e.preventDefault();
     const q = input.value.trim();
     if (q) ask(q);
-  });
-  document.addEventListener("portfolio:ask", (e) => {
-    root.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
-    ask(e.detail);
   });
 
   let busy = false;
@@ -61,13 +64,13 @@ export async function initChat(profile, root) {
       try {
         result = await askWorker(endpoint, question, history);
       } catch (err) {
-        result = offlineAnswer(index, question);
+        result = offlineAnswer(await getIndex(), question, [profile.name]);
         result.notice = err.status === 429
           ? "The assistant hit its free daily limit, so here are matching excerpts instead."
           : "The assistant is unreachable, so here are matching excerpts instead.";
       }
     } else {
-      result = offlineAnswer(index, question);
+      result = offlineAnswer(await getIndex(), question, [profile.name]);
     }
 
     history.push({ role: "user", content: question }, { role: "assistant", content: result.answer });
@@ -75,8 +78,10 @@ export async function initChat(profile, root) {
     renderAnswer(a, result);
     busy = false;
     form.querySelector("button").disabled = false;
-    input.focus();
+    input.focus({ preventScroll: true });
   }
+
+  return { ask };
 }
 
 async function loadChunks(profile) {
@@ -113,9 +118,9 @@ async function askWorker(endpoint, message, history) {
   }
 }
 
-export function offlineAnswer(index, question) {
+export function offlineAnswer(index, question, ignore = []) {
   // Keep only strong matches: weaker ones make excerpt answers noisy.
-  const ranked = search(index, question, 3);
+  const ranked = search(index, question, 3, { ignore });
   const hits = ranked.filter((h) => h.score >= ranked[0].score * 0.5);
   if (!hits.length) {
     return {

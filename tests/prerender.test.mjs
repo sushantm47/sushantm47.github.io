@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { test } from "node:test";
-import { description, escapeHtml, headTags, heroHtml, replaceBlock, sitemap } from "../scripts/prerender.mjs";
+import { description, escapeHtml, headTags, heroHtml, replaceBlock, sitemap, stampHtml, stampImports } from "../scripts/prerender.mjs";
 
 const profile = JSON.parse(await readFile(new URL("../data/profile.json", import.meta.url), "utf8"));
 
@@ -36,4 +36,19 @@ test("index.html has both prerender blocks and they are replaceable", async () =
 
 test("sitemap lists the site URL", () => {
   assert.match(sitemap("https://a.github.io/", new Date("2026-09-27")), /<loc>https:\/\/a.github.io\/<\/loc><lastmod>2026-09-27/);
+});
+
+test("asset URLs and module imports get a version stamp, and restamping replaces it", () => {
+  const html = '<link href="assets/css/style.css"><script type="module" src="assets/js/main.js"></script>';
+  const once = stampHtml(html, "abc123");
+  assert.match(once, /style\.css\?v=abc123/);
+  assert.match(once, /main\.js\?v=abc123/);
+  assert.equal(stampHtml(once, "def456").match(/\?v=/g).length, 2);
+  assert.match(stampHtml(once, "def456"), /main\.js\?v=def456/);
+
+  const js = 'import { a } from "./chat.js";\nimport { b } from "../x/y.js";\nimport c from "https://cdn/z.js";';
+  const stamped = stampImports(js, "v1");
+  assert.match(stamped, /"\.\/chat\.js\?v=v1"/);
+  assert.match(stamped, /"\.\.\/x\/y\.js\?v=v1"/);
+  assert.match(stamped, /"https:\/\/cdn\/z\.js"/, "absolute URLs are left alone");
 });

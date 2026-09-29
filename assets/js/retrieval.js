@@ -42,8 +42,10 @@ export function buildIndex(chunks, { k1 = 1.4, b = 0.75 } = {}) {
   return { docs, idf, avgLength, k1, b };
 }
 
-export function search(index, query, k = 5) {
-  const terms = [...new Set(tokenize(query))];
+// `ignore`: terms that match everything (like the site owner's name) and only add noise.
+export function search(index, query, k = 5, { ignore = [] } = {}) {
+  const skip = new Set(ignore.flatMap((t) => tokenize(t)));
+  const terms = [...new Set(tokenize(query))].filter((t) => !skip.has(t));
   if (!terms.length) return [];
   const { docs, idf, avgLength, k1, b } = index;
   const scored = [];

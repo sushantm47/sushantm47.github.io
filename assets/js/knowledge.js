@@ -31,7 +31,8 @@ export function profileToChunks(profile) {
     [
       `${name}: ${profile.role}. ${profile.headline}`,
       profile.intro,
-      profile.previously?.length && `Previously at ${joinList(profile.previously)}.`,
+      profile.previously?.length && `Previously at ${joinList(employerNames(profile))}.`,
+      profile.availability && `Availability: ${profile.availability}.`,
       ...(profile.stats || []).map((st) => `${st.value} ${st.label}.`),
       `Location: ${profile.location}.`,
       `Currently: ${profile.status}`,
@@ -88,12 +89,32 @@ export function profileToChunks(profile) {
   const skills = skillGroups(profile)
     .map((g) => `${g.group}: ${g.items.join(", ")}.${g.used_in?.length ? ` Used at or in: ${joinList(g.used_in)}.` : ""}`)
     .join("\n");
-  if (skills) add("skills", `Skills of ${name}`, skills);
+  if (skills) add("skills", "Skills", skills);
 
   for (const [i, item] of (profile.faq || []).entries()) {
     add(`faq-${i}`, f(item.q), f(item.a));
   }
   return chunks;
+}
+
+// "previously" may hold plain names or {name, url} objects.
+export function employers(profile) {
+  return (profile.previously || []).map((e) => (typeof e === "string" ? { name: e, url: "" } : e));
+}
+
+export function employerNames(profile) {
+  return employers(profile).map((e) => e.name);
+}
+
+// Splits the headline so one word or phrase can be highlighted.
+export function headlineParts(headline, accent) {
+  if (!accent || !headline.includes(accent)) return [{ text: headline, accent: false }];
+  const i = headline.indexOf(accent);
+  return [
+    { text: headline.slice(0, i), accent: false },
+    { text: accent, accent: true },
+    { text: headline.slice(i + accent.length), accent: false },
+  ].filter((p) => p.text);
 }
 
 // Skills may be a list of {group, items, used_in} or a plain {group: items} object.

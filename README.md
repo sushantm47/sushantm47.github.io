@@ -36,6 +36,7 @@ question ─> BM25 search over knowledge.json ─> top matching excerpts
 | Area | Choice |
 |---|---|
 | Site | HTML, CSS, and JavaScript modules, with no framework or build step |
+| Interaction | Scroll reveal, count-up stats, scroll-spy nav, an ask box that docks into the nav, lazy-loaded data |
 | Retrieval | BM25 search and markdown chunking, shared by the browser and the server |
 | LLM service | Cloudflare Worker calling an OpenAI-compatible API |
 | Live data | GitHub REST API for repo stats and recent activity |
@@ -47,7 +48,10 @@ question ─> BM25 search over knowledge.json ─> top matching excerpts
 ```
 index.html                   page shell
 assets/css/style.css         styles, light and dark themes
-assets/js/main.js            renders the profile, GitHub stats, theme
+assets/js/main.js            renders the profile, project tiles, case studies, theme
+assets/js/ui.js              scroll reveal, count-up, scroll-spy, docking ask box, lazy loading
+assets/js/art.js             project tile artwork drawn as SVG in code
+assets/img/                  logo and favicon
 assets/js/chat.js            assistant UI and fallback answers
 assets/js/retrieval.js       BM25 search and markdown chunking
 assets/js/knowledge.js       turns the profile into searchable chunks

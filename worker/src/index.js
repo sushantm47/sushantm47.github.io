@@ -43,7 +43,7 @@ export default {
 
     try {
       const { index, owner } = await loadKnowledge(env);
-      const hits = search(index, body.message, TOP_K);
+      const hits = search(index, body.message, TOP_K, { ignore: [owner.name || ""] });
       const sources = hits.map((h, i) => ({ n: i + 1, title: h.chunk.title, url: h.chunk.url || "" }));
       const messages = buildMessages(owner, hits, body.history || [], body.message);
       const answer = await complete(env, messages);

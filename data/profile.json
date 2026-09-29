@@ -5,9 +5,18 @@
   "headline": "I build dependable software, from data pipelines to APIs to AI agents.",
   "intro": "MS in Computer Science student at Northeastern with four years of industry experience. I've shipped production pipelines behind regulatory reporting, warehouses and dashboards for business teams, web front ends, and an AI incident-response agent that cites its evidence.",
   "previously": [
-    "Takeda",
-    "EY",
-    "Deloitte"
+    {
+      "name": "Takeda",
+      "url": "https://www.takeda.com"
+    },
+    {
+      "name": "EY",
+      "url": "https://www.ey.com"
+    },
+    {
+      "name": "Deloitte",
+      "url": "https://www.deloitte.com"
+    }
   ],
   "stats": [
     {
@@ -19,7 +28,7 @@
       "label": "production pipelines maintained at Takeda"
     },
     {
-      "value": "200–300 GB",
+      "value": "200+ GB",
       "label": "processed by pipelines I built at EY"
     },
     {
@@ -102,7 +111,9 @@
           }
         ],
         "result": "1.000 hit@5 and 1.000 MRR on a golden dataset with hybrid search, versus 0.909 MRR for either method alone, enforced as a CI quality gate. 65+ automated tests cover the agent, guardrails, and retrieval, and the AWS infrastructure is defined as code with CDK."
-      }
+      },
+      "color": "#F5A524",
+      "art": "flow"
     },
     {
       "name": "DealRadar",
@@ -155,7 +166,9 @@
           }
         ],
         "result": "A working full-stack app: Flask backend, a MySQL schema with triggers and stored procedures, a resilient scraper, and an interactive price-history dashboard."
-      }
+      },
+      "color": "#3DD68C",
+      "art": "chart"
     },
     {
       "name": "DNS simulation",
@@ -167,7 +180,9 @@
         "Sockets",
         "Networking"
       ],
-      "featured": false
+      "featured": false,
+      "color": "#2DD4BF",
+      "art": "network"
     },
     {
       "name": "COVID-19 tracker",
@@ -179,7 +194,9 @@
         "React",
         "REST APIs"
       ],
-      "featured": false
+      "featured": false,
+      "color": "#FB7185",
+      "art": "globe"
     }
   ],
   "experience": [
@@ -329,5 +346,17 @@
       "q": "Where is {first} based?",
       "a": "{first} is based in Boston, Massachusetts."
     }
+  ],
+  "greeting": "Hey, I'm {first}",
+  "headline_accent": "dependable",
+  "availability": "Open to co-op and full-time roles",
+  "card_tags": [
+    "Python",
+    "SQL",
+    "PySpark",
+    "AWS",
+    "Databricks",
+    "FastAPI",
+    "RAG"
   ]
 }

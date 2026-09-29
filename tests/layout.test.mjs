@@ -45,8 +45,11 @@ test("case studies are complete and searchable by the assistant", () => {
   assert.match(chunk.text, /Retrieve \(/);
 });
 
-test("the prerendered hero includes the credibility line and stats", () => {
+test("the prerendered hero has the greeting, highlighted word, linked employers, and stats", () => {
   const html = heroHtml(profile);
-  assert.match(html, /Previously at Takeda, EY, and Deloitte/);
+  assert.match(html, /Hey, I'm Sushant/);
+  assert.match(html, /I build <span class="accent">dependable<\/span> software/);
+  assert.match(html, /Previously at <a href="https:\/\/www.takeda.com"[^>]*>Takeda<\/a>, <a[^>]*>EY<\/a>, and <a[^>]*>Deloitte<\/a>/);
   assert.equal((html.match(/<dt>/g) || []).length, profile.stats.length);
+  assert.ok(!/style=/.test(html), "no inline styles: the CSP blocks them");
 });
