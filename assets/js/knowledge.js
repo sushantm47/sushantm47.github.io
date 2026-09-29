@@ -31,10 +31,14 @@ export function profileToChunks(profile) {
     [
       `${name}: ${profile.role}. ${profile.headline}`,
       profile.intro,
+      profile.previously?.length && `Previously at ${joinList(profile.previously)}.`,
+      ...(profile.stats || []).map((st) => `${st.value} ${st.label}.`),
       `Location: ${profile.location}.`,
       `Currently: ${profile.status}`,
       `Contact: email ${links.email}; GitHub ${githubUrl(profile)}; LinkedIn ${links.linkedin}.`,
-    ].join("\n")
+    ]
+      .filter(Boolean)
+      .join("\n")
   );
 
   for (const p of profile.projects || []) {
@@ -46,6 +50,23 @@ export function profileToChunks(profile) {
         .join("\n"),
       repoUrl(p)
     );
+    const cs = p.case_study;
+    if (cs) {
+      add(
+        `case-study-${slug(p.name)}`,
+        `Case study: ${p.name}`,
+        [
+          `Problem: ${cs.problem}`,
+          `Approach: ${cs.approach}`,
+          cs.diagram?.length && `How it works: ${cs.diagram.map((d) => `${d.step} (${d.detail})`).join(", then ")}.`,
+          ...(cs.decisions || []).map((d) => `Decision: ${d.title}. ${d.detail}`),
+          `Result: ${cs.result}`,
+        ]
+          .filter(Boolean)
+          .join("\n"),
+        repoUrl(p)
+      );
+    }
   }
 
   for (const e of profile.experience || []) {
@@ -64,8 +85,8 @@ export function profileToChunks(profile) {
     );
   }
 
-  const skills = Object.entries(profile.skills || {})
-    .map(([group, items]) => `${group}: ${items.join(", ")}.`)
+  const skills = skillGroups(profile)
+    .map((g) => `${g.group}: ${g.items.join(", ")}.${g.used_in?.length ? ` Used at or in: ${joinList(g.used_in)}.` : ""}`)
     .join("\n");
   if (skills) add("skills", `Skills of ${name}`, skills);
 
@@ -73,6 +94,36 @@ export function profileToChunks(profile) {
     add(`faq-${i}`, f(item.q), f(item.a));
   }
   return chunks;
+}
+
+// Skills may be a list of {group, items, used_in} or a plain {group: items} object.
+export function skillGroups(profile) {
+  const skills = profile.skills || [];
+  if (Array.isArray(skills)) return skills;
+  return Object.entries(skills).map(([group, items]) => ({ group, items, used_in: [] }));
+}
+
+export function joinList(items) {
+  const list = (items || []).filter(Boolean);
+  if (list.length <= 1) return list.join("");
+  if (list.length === 2) return `${list[0]} and ${list[1]}`;
+  return `${list.slice(0, -1).join(", ")}, and ${list.at(-1)}`;
+}
+
+export function projectAnchor(name) {
+  return `project-${slug(name)}`;
+}
+
+export function experienceAnchor(org) {
+  return `exp-${slug(org)}`;
+}
+
+// Resolves a "used_in" name to an on-page anchor: a project or an employer.
+export function anchorFor(name, profile) {
+  const key = String(name).toLowerCase();
+  if ((profile.projects || []).some((p) => p.name.toLowerCase() === key)) return `#${projectAnchor(name)}`;
+  if ((profile.experience || []).some((e) => e.org.toLowerCase() === key)) return `#${experienceAnchor(name)}`;
+  return null;
 }
 
 export function slug(text) {

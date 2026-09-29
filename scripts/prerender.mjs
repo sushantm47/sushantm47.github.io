@@ -4,7 +4,7 @@
 // Usage: node scripts/prerender.mjs
 
 import { readFile, writeFile } from "node:fs/promises";
-import { fill, githubUrl } from "../assets/js/knowledge.js";
+import { fill, githubUrl, joinList, skillGroups } from "../assets/js/knowledge.js";
 
 export function escapeHtml(text) {
   return String(text ?? "")
@@ -33,7 +33,7 @@ export function headTags(p) {
     email: `mailto:${p.links?.email}`,
     address: { "@type": "PostalAddress", addressLocality: p.location },
     alumniOf: (p.education || []).map((e) => ({ "@type": "CollegeOrUniversity", name: e.school })),
-    knowsAbout: Object.values(p.skills || {}).flat().slice(0, 25),
+    knowsAbout: skillGroups(p).flatMap((g) => g.items).slice(0, 25),
     sameAs: [githubUrl(p), p.links?.linkedin].filter(Boolean),
   };
   // "<" is escaped inside JSON-LD so no value can close the script element.
@@ -55,10 +55,16 @@ export function headTags(p) {
 }
 
 export function heroHtml(p) {
+  const previously = p.previously?.length ? `Previously at ${joinList(p.previously)}` : "";
+  const stats = (p.stats || [])
+    .map((st) => `<div><dt>${escapeHtml(st.value)}</dt><dd>${escapeHtml(st.label)}</dd></div>`)
+    .join("");
   return [
     `<p class="hero-who"><span data-name>${escapeHtml(p.name)}</span>, <span data-text="role">${escapeHtml(p.role)}</span></p>`,
     `      <h1 id="headline" data-text="headline">${escapeHtml(fill(p.headline, p))}</h1>`,
     `      <p class="hero-intro" data-text="intro">${escapeHtml(fill(p.intro, p))}</p>`,
+    `      <p class="hero-previously" data-text="previously"${previously ? "" : " hidden"}>${escapeHtml(previously)}</p>`,
+    `      <dl class="stats" id="stats"${stats ? "" : " hidden"}>${stats}</dl>`,
   ].join("\n");
 }
 

@@ -44,3 +44,18 @@ export function citedSources(blocks, sources) {
   const used = sources.filter((s) => cited.has(s.n));
   return used.length ? used : sources.slice(0, 3);
 }
+
+// Splits text so impact numbers ("15+", "25%", "200 to 300 GB", "5,000+") can be highlighted.
+const NUMBER = /(?<![A-Za-z@.\d])\d(?:[\d,.]*\d)?(?:\+|%)?(?:\s?(?:to|–|-)\s?\d(?:[\d,.]*\d)?(?:\+|%)?)?(?:\s?(?:GB|TB|MB|ms|x)\b)?/g;
+
+export function splitNumbers(text) {
+  const parts = [];
+  let last = 0;
+  for (const m of String(text).matchAll(NUMBER)) {
+    if (m.index > last) parts.push({ number: false, text: text.slice(last, m.index) });
+    parts.push({ number: true, text: m[0] });
+    last = m.index + m[0].length;
+  }
+  if (last < text.length) parts.push({ number: false, text: text.slice(last) });
+  return parts;
+}

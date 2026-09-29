@@ -30,6 +30,7 @@
     <nav aria-label="Primary">
       <a href="#work">Work</a>
       <a href="#experience">Experience</a>
+      <a href="#skills">Skills</a>
       <a data-href="resume" href="#" target="_blank" rel="noopener">Resume</a>
       <a data-href="github" href="#" target="_blank" rel="noopener">GitHub</a>
       <button id="theme" type="button" aria-pressed="false">Dark mode</button>
@@ -41,7 +42,9 @@
       <!-- prerender:hero -->
   <p class="hero-who"><span data-name>Sushant Mudalgi</span>, <span data-text="role">Software engineer</span></p>
       <h1 id="headline" data-text="headline">I build dependable software, from data pipelines to APIs to AI agents.</h1>
-      <p class="hero-intro" data-text="intro">MS in Computer Science student at Northeastern with four years of industry experience at Takeda, EY, and Deloitte. I've shipped production pipelines behind regulatory reporting, warehouses and dashboards for business teams, web front ends, and an AI incident-response agent that cites its evidence.</p>
+      <p class="hero-intro" data-text="intro">MS in Computer Science student at Northeastern with four years of industry experience. I've shipped production pipelines behind regulatory reporting, warehouses and dashboards for business teams, web front ends, and an AI incident-response agent that cites its evidence.</p>
+      <p class="hero-previously" data-text="previously">Previously at Takeda, EY, and Deloitte</p>
+      <dl class="stats" id="stats"><div><dt>4 years</dt><dd>of industry experience</dd></div><div><dt>15+</dt><dd>production pipelines maintained at Takeda</dd></div><div><dt>200–300 GB</dt><dd>processed by pipelines I built at EY</dd></div><div><dt>25%</dt><dd>workflow cost cut by an orchestration migration</dd></div></dl>
   <!-- /prerender:hero -->
 
       <div class="ask" id="ask">
@@ -60,6 +63,11 @@
     <section id="work" aria-labelledby="work-title">
       <h2 id="work-title">Selected work</h2>
       <div id="work-list" class="work-list"></div>
+    </section>
+
+    <section id="other" aria-labelledby="other-title">
+      <h2 id="other-title">Other projects</h2>
+      <div id="other-list" class="mini-list"></div>
     </section>
 
     <section id="experience" aria-labelledby="experience-title">

@@ -3,7 +3,30 @@
   "site_url": "https://sushantm47.github.io/",
   "role": "Software engineer",
   "headline": "I build dependable software, from data pipelines to APIs to AI agents.",
-  "intro": "MS in Computer Science student at Northeastern with four years of industry experience at Takeda, EY, and Deloitte. I've shipped production pipelines behind regulatory reporting, warehouses and dashboards for business teams, web front ends, and an AI incident-response agent that cites its evidence.",
+  "intro": "MS in Computer Science student at Northeastern with four years of industry experience. I've shipped production pipelines behind regulatory reporting, warehouses and dashboards for business teams, web front ends, and an AI incident-response agent that cites its evidence.",
+  "previously": [
+    "Takeda",
+    "EY",
+    "Deloitte"
+  ],
+  "stats": [
+    {
+      "value": "4 years",
+      "label": "of industry experience"
+    },
+    {
+      "value": "15+",
+      "label": "production pipelines maintained at Takeda"
+    },
+    {
+      "value": "200–300 GB",
+      "label": "processed by pipelines I built at EY"
+    },
+    {
+      "value": "25%",
+      "label": "workflow cost cut by an orchestration migration"
+    }
+  ],
   "location": "Boston, MA",
   "status": "Open to software engineering, data engineering, and AI engineering roles, including co-op and full-time positions. I graduate in May 2027.",
   "links": {
@@ -36,7 +59,50 @@
       ],
       "docs": [
         "docs/DESIGN.md"
-      ]
+      ],
+      "featured": true,
+      "kind": "Solo project",
+      "case_study": {
+        "problem": "When a production alarm fires, on-call engineers often spend the first 15 to 30 minutes just connecting it to a recent deploy, a moving metric, and the right runbook. The knowledge exists, but it's scattered across docs, dashboards, and logs.",
+        "approach": "An agent that works like a careful on-call engineer: it retrieves relevant runbooks and past postmortems, investigates live signals with read-only tools, writes a structured diagnosis, and has that diagnosis checked by code before anyone sees it.",
+        "diagram": [
+          {
+            "step": "Retrieve",
+            "detail": "Runbooks and postmortems, hybrid search"
+          },
+          {
+            "step": "Investigate",
+            "detail": "Deploys, metrics, logs via tool calls"
+          },
+          {
+            "step": "Synthesize",
+            "detail": "Forced structured output"
+          },
+          {
+            "step": "Verify",
+            "detail": "Citations and confidence checked in code"
+          }
+        ],
+        "decisions": [
+          {
+            "title": "Hybrid search instead of embeddings alone",
+            "detail": "Incident text is full of exact identifiers like v2.14.0 and max.poll.interval.ms that embeddings blur. BM25 keyword search catches those, dense search catches paraphrases, and Reciprocal Rank Fusion combines them by rank with no score tuning."
+          },
+          {
+            "title": "Code checks the model's citations",
+            "detail": "Everything the agent sees gets an evidence ID. A deterministic verifier drops citations that don't exist, caps confidence when an answer isn't backed by live telemetry, and escalates to a human when unsure."
+          },
+          {
+            "title": "Logs are treated as untrusted input",
+            "detail": "Log lines can contain text written by attackers. OpsPilot flags prompt-injection attempts, redacts secrets and card numbers before the model sees them, and never runs an action that changes production without human approval."
+          },
+          {
+            "title": "A state machine instead of an agent framework",
+            "detail": "Explicit steps with hard budgets on steps, tool calls, and tokens make every path unit-testable and put an upper bound on cost and latency."
+          }
+        ],
+        "result": "1.000 hit@5 and 1.000 MRR on a golden dataset with hybrid search, versus 0.909 MRR for either method alone, enforced as a CI quality gate. 65+ automated tests cover the agent, guardrails, and retrieval, and the AWS infrastructure is defined as code with CDK."
+      }
     },
     {
       "name": "DealRadar",
@@ -50,7 +116,46 @@
         "BeautifulSoup",
         "Pandas",
         "Chart.js"
-      ]
+      ],
+      "featured": true,
+      "kind": "Solo project",
+      "case_study": {
+        "problem": "Online prices change constantly, and good deals disappear before anyone notices. Checking products by hand doesn't scale past a few items.",
+        "approach": "Paste an Amazon product link. A scraper collects the price, the database records every change, and a dashboard charts price history and flags a deal when the price drops below your target.",
+        "diagram": [
+          {
+            "step": "Scrape",
+            "detail": "CloudScraper and BeautifulSoup"
+          },
+          {
+            "step": "Store",
+            "detail": "Price history in MySQL"
+          },
+          {
+            "step": "Detect",
+            "detail": "Triggers and stored procedures"
+          },
+          {
+            "step": "Show",
+            "detail": "Flask dashboard with Chart.js"
+          }
+        ],
+        "decisions": [
+          {
+            "title": "Deal detection lives in the database",
+            "detail": "MySQL triggers and stored procedures compare each new price with the user's target, so the alert logic runs exactly where the data changes."
+          },
+          {
+            "title": "A scraper built for messy product pages",
+            "detail": "It handles deal prices, price ranges, and hidden prices instead of assuming every page shows one clean number."
+          },
+          {
+            "title": "Context beyond the price",
+            "detail": "Deal news from RSS feeds sits next to the price-history charts, so users see why a price might be moving."
+          }
+        ],
+        "result": "A working full-stack app: Flask backend, a MySQL schema with triggers and stored procedures, a resilient scraper, and an interactive price-history dashboard."
+      }
     },
     {
       "name": "DNS simulation",
@@ -61,7 +166,8 @@
         "Python",
         "Sockets",
         "Networking"
-      ]
+      ],
+      "featured": false
     },
     {
       "name": "COVID-19 tracker",
@@ -72,7 +178,8 @@
         "JavaScript",
         "React",
         "REST APIs"
-      ]
+      ],
+      "featured": false
     }
   ],
   "experience": [
@@ -139,45 +246,76 @@
       "notes": "GPA 3.91 / 4.00. Coursework: Distributed Cloud Computing, Computer Networks, Database Management Systems, Machine Learning."
     }
   ],
-  "skills": {
-    "Languages": [
-      "Python",
-      "SQL",
-      "Java",
-      "JavaScript",
-      "PySpark"
-    ],
-    "Backend and web": [
-      "FastAPI",
-      "REST APIs",
-      "Flask",
-      "React.js",
-      "PostgreSQL",
-      "MySQL",
-      "MongoDB",
-      "Docker",
-      "Git and GitHub",
-      "CI/CD (Jenkins, GitHub Actions)"
-    ],
-    "Data and cloud": [
-      "Databricks (Delta Lake, Unity Catalog)",
-      "Spark",
-      "AWS (S3, Glue, Redshift, Lambda, DMS, EventBridge, Step Functions)",
-      "Snowflake",
-      "Airflow",
-      "Tidal",
-      "Talend",
-      "Tableau"
-    ],
-    "AI and ML": [
-      "RAG and hybrid search",
-      "LLM agents, tool use, and MCP",
-      "Evals and guardrails",
-      "scikit-learn",
-      "XGBoost",
-      "Pandas and NumPy"
-    ]
-  },
+  "skills": [
+    {
+      "group": "Languages",
+      "items": [
+        "Python",
+        "SQL",
+        "Java",
+        "JavaScript",
+        "PySpark"
+      ],
+      "used_in": [
+        "Takeda",
+        "EY GDS",
+        "OpsPilot"
+      ]
+    },
+    {
+      "group": "Backend and web",
+      "items": [
+        "FastAPI",
+        "REST APIs",
+        "Flask",
+        "React.js",
+        "PostgreSQL",
+        "MySQL",
+        "MongoDB",
+        "Docker",
+        "Git and GitHub",
+        "CI/CD (Jenkins, GitHub Actions)"
+      ],
+      "used_in": [
+        "OpsPilot",
+        "DealRadar",
+        "Kalpas Innovations"
+      ]
+    },
+    {
+      "group": "Data and cloud",
+      "items": [
+        "Databricks (Delta Lake, Unity Catalog)",
+        "Spark",
+        "AWS (S3, Glue, Redshift, Lambda, DMS, EventBridge, Step Functions)",
+        "Snowflake",
+        "Airflow",
+        "Tidal",
+        "Talend",
+        "Tableau"
+      ],
+      "used_in": [
+        "Takeda",
+        "EY GDS",
+        "Deloitte USI"
+      ]
+    },
+    {
+      "group": "AI and ML",
+      "items": [
+        "RAG and hybrid search",
+        "LLM agents, tool use, and MCP",
+        "Evals and guardrails",
+        "scikit-learn",
+        "XGBoost",
+        "Pandas and NumPy"
+      ],
+      "used_in": [
+        "OpsPilot",
+        "Deloitte USI"
+      ]
+    }
+  ],
   "faq": [
     {
       "q": "When can {first} start?",
