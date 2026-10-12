@@ -1,4 +1,5 @@
-# Cloudflare Worker for the portfolio chat. Deploy: npx wrangler deploy
+# Cloudflare Worker for the portfolio chat.
+# Deployed by .github/workflows/deploy-worker.yml on every push that changes it.
 name = "portfolio-chat"
 main = "src/index.js"
 compatibility_date = "2026-06-01"
@@ -15,9 +16,8 @@ LLM_MODEL = "openai/gpt-oss-20b"
 # FALLBACK_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/openai"
 # FALLBACK_MODEL = "gemini-flash-lite-latest"
 
-# Secrets are set with the CLI and never committed:
-#   npx wrangler secret put LLM_API_KEY
-#   npx wrangler secret put FALLBACK_API_KEY   (optional)
+# Secrets are never committed. LLM_API_KEY is stored as a GitHub Actions secret and uploaded
+# to Cloudflare by the deploy workflow. (Locally: npx wrangler secret put LLM_API_KEY)
 
 # Optional per-visitor rate limit (10 questions per minute per IP). Uncomment to enable.
 # [[ratelimits]]

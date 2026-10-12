@@ -68,7 +68,6 @@ function el(tag, attrs = {}, ...children) {
 function renderProfile(p) {
   const f = (t) => fill(t, p);
   const links = p.links || {};
-  document.title = `${p.name}, ${p.role}`;
   for (const node of document.querySelectorAll("[data-name]")) node.textContent = p.name;
   setText("tagline", f(p.tagline || p.intro));
   setText("status", f(p.status));
@@ -89,14 +88,17 @@ function renderProfile(p) {
 
   const projects = p.projects || [];
   const tiles = document.getElementById("tiles");
+  tiles.replaceChildren(); // replaces the prerendered copy with interactive tiles
   projects.filter((x) => x.featured !== false).forEach((project, i) => tiles.append(tile(project, i + 1, f)));
   const more = document.getElementById("more-list");
+  more.replaceChildren();
   for (const project of projects.filter((x) => x.featured === false)) {
     more.append(moreRow({ name: project.name, text: f(project.tagline || project.summary), tags: project.stack, url: repoUrl(project), repo: project.repo }));
   }
   initCaseDialog(p, f);
 
   const roles = document.getElementById("roles");
+  roles.replaceChildren();
   (p.experience || []).forEach((e, i) => {
     const item = el("li", { id: experienceAnchor(e.org), class: "role", "data-reveal": "" },
       el("div", { class: "role-head" },
@@ -112,6 +114,7 @@ function renderProfile(p) {
   });
 
   const edu = document.getElementById("edu-list");
+  edu.replaceChildren();
   for (const ed of p.education || []) {
     const gpa = /GPA [\d.]+ \/ [\d.]+/.exec(ed.notes || "")?.[0];
     edu.append(el("li", {},

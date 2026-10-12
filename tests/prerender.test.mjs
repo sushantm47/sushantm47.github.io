@@ -1,17 +1,32 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { test } from "node:test";
-import { analyticsTag, description, escapeHtml, headTags, heroHtml, replaceBlock, sitemap, stampHtml, stampImports } from "../scripts/prerender.mjs";
+import { analyticsTag, description, eduHtml, escapeHtml, fillStatic, headTags, moreHtml, rolesHtml, statsHtml, tilesHtml, heroHtml, replaceBlock, sitemap, stampHtml, stampImports } from "../scripts/prerender.mjs";
 
 const profile = JSON.parse(await readFile(new URL("../data/profile.json", import.meta.url), "utf8"));
 
-test("head tags carry the name, description, canonical URL, and valid JSON-LD", () => {
+test("head tags carry a search-friendly title, description, canonical URL, and preview image", () => {
   const head = headTags(profile);
-  assert.match(head, /<title>Sushant Mudalgi, Software engineer<\/title>/);
+  assert.match(head, /<title>Sushant Mudalgi \| Software Engineer, Data and AI \| Boston<\/title>/);
   assert.match(head, /<link rel="canonical" href="https:\/\/sushantm47.github.io\/">/);
-  const ld = JSON.parse(head.match(/application\/ld\+json">(.*)<\/script>/)[1]);
-  assert.equal(ld["@type"], "Person");
-  assert.ok(ld.sameAs.includes("https://github.com/sushantm47"));
+  assert.match(head, /<meta name="robots" content="index, follow, max-image-preview:large">/);
+  assert.match(head, /<meta property="og:image" content="https:\/\/sushantm47.github.io\/assets\/img\/og.png">/);
+  assert.match(head, /<meta name="twitter:card" content="summary_large_image">/);
+});
+
+test("structured data describes a profile page, the person, and each project", () => {
+  const head = headTags(profile);
+  const ld = JSON.parse(head.match(/application\/ld\+json">(.*?)<\/script>/)[1]);
+  const types = ld["@graph"].map((n) => n["@type"]);
+  assert.equal(types[0], "ProfilePage");
+  const person = ld["@graph"].find((n) => n["@type"] === "Person");
+  assert.equal(ld["@graph"][0].mainEntity["@id"], person["@id"]);
+  assert.ok(person.sameAs.includes("https://github.com/sushantm47"));
+  assert.ok(person.alumniOf.some((o) => o.name === "Takeda"));
+  assert.ok(person.alumniOf.some((o) => o.name === "Northeastern University"));
+  const code = ld["@graph"].filter((n) => n["@type"] === "SoftwareSourceCode");
+  assert.equal(code.length, profile.projects.length);
+  assert.ok(code.every((c) => c.codeRepository.startsWith("https://github.com/")));
 });
 
 test("text is escaped so profile content can't break the page", () => {
@@ -22,7 +37,9 @@ test("text is escaped so profile content can't break the page", () => {
 });
 
 test("description fits a search snippet", () => {
-  assert.equal(description(profile), "Sushant Mudalgi, software engineer in Boston, MA. I build dependable software, from data pipelines to APIs to AI agents.");
+  assert.equal(description(profile), profile.seo_description);
+  assert.ok(description(profile).length <= 160);
+  assert.match(description({ ...profile, seo_description: "" }), /^Sushant Mudalgi, software engineer in Boston, MA\./);
   assert.ok(description({ ...profile, headline: "word ".repeat(100) }).length <= 160);
 });
 
@@ -75,4 +92,32 @@ test("the page's Content Security Policy allows the analytics beacon and nothing
   assert.match(csp, /script-src 'self' https:\/\/static\.cloudflareinsights\.com;/);
   assert.match(csp, /connect-src [^;]*https:\/\/cloudflareinsights\.com/);
   assert.ok(!/unsafe-inline/.test(csp));
+});
+
+test("the whole page is readable without JavaScript", async () => {
+  const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
+  for (const text of ["OpsPilot", "DealRadar", "DNS simulation", "Data Engineer L4", "at Takeda", "at EY GDS",
+    "Northeastern University", "15+", "Let's build something dependable."]) {
+    assert.ok(html.includes(text), `missing from static HTML: ${text}`);
+  }
+  assert.ok(!/data-href="(github|linkedin|resume|email)" href="#"/.test(html), "links still point to #");
+  assert.match(html, /rel="me noopener"/);
+});
+
+test("prerendered sections match the profile and escape its text", () => {
+  assert.equal((tilesHtml(profile).match(/class="tile"/g) || []).length, profile.projects.filter((p) => p.featured !== false).length);
+  assert.equal((moreHtml(profile).match(/<li /g) || []).length, profile.projects.filter((p) => p.featured === false).length);
+  assert.equal((rolesHtml(profile).match(/class="role"/g) || []).length, profile.experience.length);
+  assert.equal((statsHtml(profile).match(/<dt>/g) || []).length, profile.stats.length);
+  assert.match(eduHtml(profile), /GPA 3\.91 \/ 4\.00/);
+  const evil = { ...profile, experience: [{ ...profile.experience[0], role: "<script>alert(1)</script>" }] };
+  assert.ok(!rolesHtml(evil).includes("<script>"));
+});
+
+test("static links are filled in and the step is repeatable", () => {
+  const html = '<a data-href="github" href="#">GitHub</a><p data-text="location"></p>';
+  const once = fillStatic(html, profile);
+  assert.match(once, /href="https:\/\/github.com\/sushantm47"/);
+  assert.match(once, /<p data-text="location">Boston, MA<\/p>/);
+  assert.equal(fillStatic(once, profile), once);
 });

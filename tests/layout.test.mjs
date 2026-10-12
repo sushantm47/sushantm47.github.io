@@ -48,6 +48,7 @@ test("case studies are complete and searchable by the assistant", () => {
 test("the prerendered hero has availability, the highlighted word, and linked employers", () => {
   const html = heroHtml(profile);
   assert.match(html, /Open to co-op and full-time roles, graduating May 2027/);
+  assert.match(html, /<p class="hero-name"><span data-name>Sushant Mudalgi<\/span><\/p>/, "name is visible above the headline");
   assert.match(html, /I build <span class="accent">dependable<\/span> software/);
   assert.match(html, /Previously at <a href="https:\/\/www.takeda.com"[^>]*>Takeda<\/a>, <a[^>]*>EY<\/a>, and <a[^>]*>Deloitte<\/a>/);
   assert.ok(!/<dl/.test(html), "stats live in Experience now, not the hero");

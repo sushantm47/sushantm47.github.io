@@ -120,10 +120,21 @@ sources. The assistant never shows an error page.
 
 ## Search engines and link previews
 
-The page content is rendered by JavaScript, but `scripts/prerender.mjs` writes the real
-title, description, headline, and introduction into the HTML at build time, along with
-JSON-LD `Person` data (name, role, schools, skills, GitHub and LinkedIn), Open Graph tags
-for link previews, `sitemap.xml`, and `robots.txt`.
+The page is rendered by JavaScript, but `scripts/prerender.mjs` writes the complete page
+into the HTML at build time, so crawlers and link previews never need to run any code:
+
+- **All content:** hero, project tiles, more projects, stats, every role, education, and
+  contact text, with the same markup the page script produces. When JavaScript runs, it
+  replaces these with the interactive versions instead of adding a second copy.
+- **Real links:** GitHub, LinkedIn, resume, and email links are written in, marked
+  `rel="me"` so search engines can tie the profiles to the same person.
+- **Title and description** tuned for what people search: name, role, city, school, and
+  employers.
+- **Structured data:** a JSON-LD graph with a `ProfilePage` whose main entity is a
+  `Person` (role, schools and employers, skills, profile links), plus each project as
+  `SoftwareSourceCode` with its repository.
+- **Link previews:** Open Graph and Twitter tags with a 1200×630 preview image.
+- `sitemap.xml`, `robots.txt`, a canonical URL, and `max-image-preview:large`.
 
 ## Visitor analytics
 
@@ -144,8 +155,13 @@ request counts on the Worker's own dashboard.
 
 ## Deployment
 
-The **Deploy site** GitHub Actions workflow runs on every push to `main`, every Monday,
-and on demand:
+Two GitHub Actions workflows deploy everything; nothing is deployed from a laptop.
+
+**Deploy worker** runs when the Worker's code changes: it runs the tests, then deploys to
+Cloudflare with the official `wrangler` action. The Cloudflare API token and the LLM key
+are GitHub encrypted secrets, uploaded to Cloudflare as Worker secrets.
+
+**Deploy site** runs on every push to `main`, every Monday, and on demand:
 
 1. Run the test suite.
 2. Build `knowledge.json` from the profile and my repos.
@@ -154,7 +170,7 @@ and on demand:
 
 ## Tests
 
-`npm test` runs 44 tests with Node's built-in test runner, covering retrieval and
+`npm test` runs 48 tests with Node's built-in test runner, covering retrieval and
 chunking, knowledge building and repo discovery, safe answer rendering, offline answers,
 the Worker (origin checks, validation, provider fallback, rate-limit handling),
 prerendering and escaping, cache busting, and layout helpers such as number highlighting

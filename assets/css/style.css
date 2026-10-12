@@ -188,6 +188,7 @@ section { padding-top: clamp(5rem, 11vw, 8rem); }
 .pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); animation: ping-ok 2.4s ease-out infinite; }
 @keyframes ping-ok { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--ok) 55%, transparent); } 70%, 100% { box-shadow: 0 0 0 8px transparent; } }
 
+.hero-name { font: 700 clamp(1.15rem, 2vw, 1.4rem) var(--sans); letter-spacing: -0.01em; margin: 0 0 0.6rem; }
 .hero h1 {
   font-size: clamp(2.6rem, 6.6vw, 5.6rem); line-height: 1; font-weight: 800; letter-spacing: -0.045em;
   max-width: 17ch; margin: 0 0 1.6rem;
