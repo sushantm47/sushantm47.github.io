@@ -297,7 +297,8 @@ async function loadMoreRepos(profile) {
     const list = await gh(`/users/${user}/repos?sort=pushed&per_page=12`);
     const target = document.getElementById("more-list");
     const extra = list.filter((x) => !x.fork && !x.archived && !shown.has(x.full_name.toLowerCase())
-      && x.name.toLowerCase() !== `${user}.github.io`.toLowerCase() && x.description);
+      && x.name.toLowerCase() !== `${user}.github.io`.toLowerCase()
+      && (x.description || "").trim().length >= 25); // skip repos without a real description
     for (const r of extra.slice(0, 4)) {
       target.append(moreRow({ name: r.name, text: r.description, tags: r.language ? [r.language] : [], url: r.html_url, repo: r.full_name }));
     }

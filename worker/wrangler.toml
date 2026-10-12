@@ -1,7 +1,7 @@
 # Cloudflare Worker for the portfolio chat. Deploy: npx wrangler deploy
 name = "portfolio-chat"
 main = "src/index.js"
-compatibility_date = "2026-09-01"
+compatibility_date = "2026-06-01"
 
 [vars]
 # Your GitHub Pages site, exactly as the browser shows it (no trailing slash).

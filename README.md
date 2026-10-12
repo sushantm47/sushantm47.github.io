@@ -63,6 +63,10 @@ worker/                      serverless LLM proxy
 tests/                       unit tests (node --test)
 ```
 
+## More detail
+
+[How this portfolio works](docs/HOW_IT_WORKS.md): the RAG pipeline, safety, performance, and deployment.
+
 ## Contact
 
 mudalgi.s@northeastern.edu · [LinkedIn](https://www.linkedin.com/in/sushant-mudalgi) · [GitHub](https://github.com/sushantm47)
