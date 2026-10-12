@@ -21,6 +21,18 @@ export function description(p) {
   return text.length > 160 ? `${text.slice(0, text.lastIndexOf(" ", 157))}…` : text;
 }
 
+// Cloudflare Web Analytics: cookie-free visitor counts. Added only when a token is set in
+// profile.json. Tokens are 32 hex characters; anything else is ignored so it can't inject markup.
+export function analyticsTag(p) {
+  const token = String(p.analytics?.cloudflare_token || "").trim();
+  if (!token) return "";
+  if (!/^[a-f0-9]{32}$/i.test(token)) {
+    console.warn("Warning: analytics.cloudflare_token in data/profile.json doesn't look like a token; skipping.");
+    return "";
+  }
+  return `<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "${token}"}'></script>`;
+}
+
 export function headTags(p) {
   const url = p.site_url;
   const title = `${p.name}, ${p.role}`;
@@ -50,6 +62,7 @@ export function headTags(p) {
     url && `<meta property="og:url" content="${escapeHtml(url)}">`,
     `<meta name="twitter:card" content="summary">`,
     `<script type="application/ld+json">${jsonLd}</script>`,
+    analyticsTag(p),
   ]
     .filter(Boolean)
     .join("\n  ");

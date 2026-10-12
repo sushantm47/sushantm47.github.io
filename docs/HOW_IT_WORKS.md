@@ -100,7 +100,8 @@ sources. The assistant never shows an error page.
   citation numbers) and rendered with `textContent`. A model reply containing
   `<script>` shows up as harmless text.
 - **Content Security Policy:** the page may only load its own files, Google Fonts, the
-  GitHub API, and the Worker. No inline scripts or styles are allowed.
+  GitHub API, the Worker, and Cloudflare's analytics beacon. No inline scripts or styles
+  are allowed.
 - **No surprise bills:** free tiers without a card can't charge anything; the worst case
   is hitting a daily limit, which triggers the fallback.
 
@@ -124,6 +125,13 @@ title, description, headline, and introduction into the HTML at build time, alon
 JSON-LD `Person` data (name, role, schools, skills, GitHub and LinkedIn), Open Graph tags
 for link previews, `sitemap.xml`, and `robots.txt`.
 
+## Visitor analytics
+
+Visits are counted with Cloudflare Web Analytics, which uses no cookies and stores no
+personal data, so no consent banner is needed. The script is added at build time only
+when a token is set in `profile.json`. Questions asked to the assistant show up as
+request counts on the Worker's own dashboard.
+
 ## Interaction design
 
 - One story from top to bottom: who I am, what I've built, ask about it, where I've
@@ -146,7 +154,7 @@ and on demand:
 
 ## Tests
 
-`npm test` runs 42 tests with Node's built-in test runner, covering retrieval and
+`npm test` runs 44 tests with Node's built-in test runner, covering retrieval and
 chunking, knowledge building and repo discovery, safe answer rendering, offline answers,
 the Worker (origin checks, validation, provider fallback, rate-limit handling),
 prerendering and escaping, cache busting, and layout helpers such as number highlighting

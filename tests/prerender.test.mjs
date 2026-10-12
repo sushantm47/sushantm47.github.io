@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { test } from "node:test";
-import { description, escapeHtml, headTags, heroHtml, replaceBlock, sitemap, stampHtml, stampImports } from "../scripts/prerender.mjs";
+import { analyticsTag, description, escapeHtml, headTags, heroHtml, replaceBlock, sitemap, stampHtml, stampImports } from "../scripts/prerender.mjs";
 
 const profile = JSON.parse(await readFile(new URL("../data/profile.json", import.meta.url), "utf8"));
 
@@ -51,4 +51,28 @@ test("asset URLs and module imports get a version stamp, and restamping replaces
   assert.match(stamped, /"\.\/chat\.js\?v=v1"/);
   assert.match(stamped, /"\.\.\/x\/y\.js\?v=v1"/);
   assert.match(stamped, /"https:\/\/cdn\/z\.js"/, "absolute URLs are left alone");
+});
+
+test("the analytics script is added only for a valid token", () => {
+  assert.equal(analyticsTag({}), "");
+  assert.equal(analyticsTag({ analytics: { cloudflare_token: "" } }), "");
+  const ok = analyticsTag({ analytics: { cloudflare_token: "0123456789abcdef0123456789abcdef" } });
+  assert.match(ok, /static\.cloudflareinsights\.com\/beacon\.min\.js/);
+  assert.match(ok, /"token": "0123456789abcdef0123456789abcdef"/);
+  const realWarn = console.warn;
+  console.warn = () => {};
+  try {
+    assert.equal(analyticsTag({ analytics: { cloudflare_token: '"></script><script>alert(1)' } }), "");
+  } finally {
+    console.warn = realWarn;
+  }
+});
+
+test("the page's Content Security Policy allows the analytics beacon and nothing extra", async () => {
+  const { readFile } = await import("node:fs/promises");
+  const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
+  const csp = html.match(/Content-Security-Policy" content="([^"]+)"/)[1];
+  assert.match(csp, /script-src 'self' https:\/\/static\.cloudflareinsights\.com;/);
+  assert.match(csp, /connect-src [^;]*https:\/\/cloudflareinsights\.com/);
+  assert.ok(!/unsafe-inline/.test(csp));
 });

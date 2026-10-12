@@ -41,6 +41,7 @@ question ─> BM25 search over knowledge.json ─> top matching excerpts
 | LLM service | Cloudflare Worker calling an OpenAI-compatible API |
 | Live data | GitHub REST API for repo stats and recent activity |
 | Hosting | GitHub Pages, deployed by GitHub Actions |
+| Analytics | Cloudflare Web Analytics (cookie-free) |
 | Search engines | Page text, meta tags, and JSON-LD rendered into the HTML at build time |
 
 ## Structure

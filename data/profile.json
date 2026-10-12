@@ -380,5 +380,8 @@
   "greeting": "Hey, I'm {first}",
   "headline_accent": "dependable",
   "availability": "Open to co-op and full-time roles",
-  "tagline": "Software engineer and MS in Computer Science student at Northeastern, with four years of industry experience across data platforms, backend services, and applied AI."
+  "tagline": "Software engineer and MS in Computer Science student at Northeastern, with four years of industry experience across data platforms, backend services, and applied AI.",
+  "analytics": {
+    "cloudflare_token": ""
+  }
 }
