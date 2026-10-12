@@ -47,7 +47,7 @@
     "resume": "assets/resume.pdf"
   },
   "chat": {
-    "endpoint": "",
+    "endpoint": "https://portfolio-chat.sushantmudalgi99.workers.dev",
     "suggestions": [
       "What has {first} built in production?",
       "How does OpsPilot avoid made-up answers?",
