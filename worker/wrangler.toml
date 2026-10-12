@@ -16,6 +16,13 @@ LLM_MODEL = "openai/gpt-oss-20b"
 # FALLBACK_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/openai"
 # FALLBACK_MODEL = "gemini-flash-lite-latest"
 
+# Built-in default model: Cloudflare Workers AI, used when the APIs above are unavailable
+# (daily limit reached, key revoked). It runs in this Cloudflare account; no key needed.
+WORKERS_AI_MODEL = "@cf/meta/llama-3.1-8b-instruct"
+
+[ai]
+binding = "AI"
+
 # Secrets are never committed. LLM_API_KEY is stored as a GitHub Actions secret and uploaded
 # to Cloudflare by the deploy workflow. (Locally: npx wrangler secret put LLM_API_KEY)
 

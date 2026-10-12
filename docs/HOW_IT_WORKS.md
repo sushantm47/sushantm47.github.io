@@ -69,12 +69,19 @@ The same module runs in three places: the build script, the Worker, and the brow
 3. Returns the answer plus a source list, which the page turns into highlighted citation
    marks linked to the repo or file.
 
-It uses any **OpenAI-compatible API** (Groq by default), with an optional second
-provider that's tried automatically when the first hits its free daily limit.
+Models are tried in order, and the first good answer wins:
+
+1. **Groq** (any OpenAI-compatible API) as the primary model.
+2. An optional **second API**, configured the same way.
+3. **Cloudflare Workers AI**, a model built into the Cloudflare account through a binding,
+   with no extra key.
+
+A provider that's rate limited, out of its free quota, or rejects its key is skipped. The
+response records which model answered, which helps when debugging.
 
 ### 4. Fallback
 
-If no LLM is configured, or both providers are unavailable, the browser answers on its
+If no model is configured, or every model is unavailable, the browser answers on its
 own: it searches `knowledge.json` locally and shows the best-matching excerpts with their
 sources. The assistant never shows an error page.
 
@@ -170,8 +177,8 @@ are GitHub encrypted secrets, uploaded to Cloudflare as Worker secrets.
 
 ## Tests
 
-`npm test` runs 48 tests with Node's built-in test runner, covering retrieval and
+`npm test` runs 53 tests with Node's built-in test runner, covering retrieval and
 chunking, knowledge building and repo discovery, safe answer rendering, offline answers,
-the Worker (origin checks, validation, provider fallback, rate-limit handling),
+the Worker (origin checks, validation, the three-model fallback chain, rate-limit handling),
 prerendering and escaping, cache busting, and layout helpers such as number highlighting
 and count-up frames.

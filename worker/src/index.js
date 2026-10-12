@@ -46,8 +46,8 @@ export default {
       const hits = search(index, body.message, TOP_K, { ignore: [owner.name || ""] });
       const sources = hits.map((h, i) => ({ n: i + 1, title: h.chunk.title, url: h.chunk.url || "" }));
       const messages = buildMessages(owner, hits, body.history || [], body.message);
-      const answer = await complete(env, messages);
-      return json({ answer, sources, mode: "llm" }, 200, cors);
+      const { text, provider } = await complete(env, messages);
+      return json({ answer: text, sources, mode: "llm", provider }, 200, cors);
     } catch (err) {
       console.error("chat failed", err);
       const status = err.status === 429 ? 429 : 502;
@@ -129,15 +129,21 @@ export function buildMessages(owner, hits, history, message) {
   ];
 }
 
+const DEFAULT_WORKERS_AI_MODEL = "@cf/meta/llama-3.1-8b-instruct";
+
+// Tries each configured model in order and returns the first good answer:
+//   1. LLM_* (Groq by default)  2. FALLBACK_* (optional second API)
+//   3. Cloudflare Workers AI through the AI binding: built into the account, no key needed.
+// A provider that is rate limited, out of quota, or rejects its key is skipped.
 export async function complete(env, messages) {
-  const providers = [
-    { base: env.LLM_BASE_URL || "https://api.groq.com/openai/v1", model: env.LLM_MODEL, key: env.LLM_API_KEY },
-    { base: env.FALLBACK_BASE_URL, model: env.FALLBACK_MODEL, key: env.FALLBACK_API_KEY },
+  const apis = [
+    { name: "primary", base: env.LLM_BASE_URL || "https://api.groq.com/openai/v1", model: env.LLM_MODEL, key: env.LLM_API_KEY },
+    { name: "fallback", base: env.FALLBACK_BASE_URL, model: env.FALLBACK_MODEL, key: env.FALLBACK_API_KEY },
   ].filter((p) => p.base && p.model && p.key);
-  if (!providers.length) throw new Error("No LLM provider configured (LLM_MODEL and LLM_API_KEY)");
+  if (!apis.length && !env.AI) throw new Error("No LLM configured (LLM_API_KEY or the AI binding)");
 
   let lastError;
-  for (const p of providers) {
+  for (const p of apis) {
     try {
       const res = await fetch(`${p.base.replace(/\/$/, "")}/chat/completions`, {
         method: "POST",
@@ -145,16 +151,31 @@ export async function complete(env, messages) {
         body: JSON.stringify({ model: p.model, messages, temperature: 0.2, max_tokens: 500 }),
       });
       if (!res.ok) {
-        const error = new Error(`${p.base} returned ${res.status}`);
+        const error = new Error(`${p.name} returned ${res.status}`);
         error.status = res.status;
         throw error;
       }
       const data = await res.json();
       const text = cleanAnswer(data?.choices?.[0]?.message?.content);
-      if (text) return text;
-      throw new Error(`${p.base} returned an empty answer`);
+      if (text) return { text, provider: p.name };
+      throw new Error(`${p.name} returned an empty answer`);
     } catch (err) {
-      lastError = err; // try the next provider (free tiers hit daily limits)
+      console.warn("provider failed, trying the next one", p.name, err.message);
+      lastError = err;
+    }
+  }
+
+  if (env.AI) {
+    try {
+      const model = env.WORKERS_AI_MODEL || DEFAULT_WORKERS_AI_MODEL;
+      const data = await env.AI.run(model, { messages, max_tokens: 500, temperature: 0.2 });
+      // Workers AI text models reply as {response}; some newer ones use the OpenAI shape.
+      const text = cleanAnswer(data?.response ?? data?.choices?.[0]?.message?.content);
+      if (text) return { text, provider: "workers-ai" };
+      throw new Error("workers-ai returned an empty answer");
+    } catch (err) {
+      console.warn("Workers AI failed", err.message);
+      lastError = lastError || err;
     }
   }
   throw lastError;

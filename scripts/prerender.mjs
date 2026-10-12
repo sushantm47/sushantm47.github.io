@@ -237,6 +237,9 @@ export function fillStatic(html, p) {
   };
   let out = html.replace(/data-href="(\w+)" href="[^"]*"/g, (m, key) =>
     hrefs[key] ? `data-href="${key}" href="${escapeHtml(hrefs[key])}"` : m);
+  // Saved resumes get a recognizable file name instead of "resume.pdf".
+  const fileName = `${p.name.trim().replace(/\s+/g, "-")}-Resume.pdf`;
+  out = out.replace(/(data-href="resume" href="[^"]*" )download(="[^"]*")?/g, `$1download="${escapeHtml(fileName)}"`);
   const texts = { "email-text": links.email, status: fill(p.status, p), location: p.location };
   out = out.replace(/(<(\w+)[^>]*data-text="([\w-]+)"[^>]*>)[^<]*(<\/\2>)/g, (m, open, tag, key, close) =>
     key in texts && texts[key] ? `${open}${escapeHtml(texts[key])}${close}` : m);

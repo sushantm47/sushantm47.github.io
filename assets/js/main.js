@@ -267,7 +267,7 @@ function setText(key, value) {
 function setHref(key, value) {
   for (const node of document.querySelectorAll(`[data-href="${key}"]`)) {
     if (value) node.setAttribute("href", value);
-    else node.hidden = true;
+    else node.hidden = true; // e.g. no resume file configured: hide its buttons
   }
 }
 

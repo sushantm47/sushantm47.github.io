@@ -97,3 +97,58 @@ test("helpers", () => {
   assert.deepEqual(msgs.map((m) => m.role), ["system", "user", "user"]);
   assert.match(msgs[0].content, /no matching information/);
 });
+
+function fakeAI(reply) {
+  const calls = [];
+  return {
+    calls,
+    async run(model, input) {
+      calls.push({ model, input });
+      if (reply instanceof Error) throw reply;
+      return reply;
+    },
+  };
+}
+
+const post = (body, e) =>
+  worker.fetch(
+    new Request("https://w.dev/chat", { method: "POST", headers: { origin: ORIGIN }, body: JSON.stringify(body) }),
+    e
+  );
+
+test("Cloudflare's built-in model answers when Groq rejects the key or is out of quota", async () => {
+  for (const status of [401, 429, 500]) {
+    mockFetch(async () => new Response("no", { status }));
+    const ai = fakeAI({ response: "Built-in model answer [1]." });
+    const res = await post({ message: "What is OpsPilot?" }, { ...env, AI: ai, WORKERS_AI_MODEL: "@cf/test/model" });
+    const body = await res.json();
+    assert.equal(res.status, 200, `status ${status}`);
+    assert.equal(body.answer, "Built-in model answer [1].");
+    assert.equal(body.provider, "workers-ai");
+    assert.equal(ai.calls[0].model, "@cf/test/model");
+    assert.match(ai.calls[0].input.messages[0].content, /Answer ONLY from the numbered context/);
+  }
+});
+
+test("Groq is still preferred when it works", async () => {
+  mockFetch(async () => Response.json({ choices: [{ message: { content: "From Groq [1]." } }] }));
+  const ai = fakeAI({ response: "should not be used" });
+  const body = await (await post({ message: "What is OpsPilot?" }, { ...env, AI: ai })).json();
+  assert.equal(body.provider, "primary");
+  assert.equal(ai.calls.length, 0);
+});
+
+test("the built-in model alone is enough, with the default model name", async () => {
+  mockFetch(async () => { throw new Error("no API should be called"); });
+  const ai = fakeAI({ choices: [{ message: { content: "OpenAI-shaped reply [1]." } }] });
+  const { LLM_API_KEY, ...noKey } = env;
+  const body = await (await post({ message: "What is OpsPilot?" }, { ...noKey, AI: ai })).json();
+  assert.equal(body.answer, "OpenAI-shaped reply [1].");
+  assert.equal(ai.calls[0].model, "@cf/meta/llama-3.1-8b-instruct");
+});
+
+test("when every model fails, the site gets an error and shows offline excerpts", async () => {
+  mockFetch(async () => new Response("limit", { status: 429 }));
+  const res = await post({ message: "What is OpsPilot?" }, { ...env, AI: fakeAI(new Error("daily limit")) });
+  assert.equal(res.status, 429);
+});

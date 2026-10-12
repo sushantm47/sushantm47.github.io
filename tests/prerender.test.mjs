@@ -114,6 +114,16 @@ test("prerendered sections match the profile and escape its text", () => {
   assert.ok(!rolesHtml(evil).includes("<script>"));
 });
 
+test("resume buttons: one opens it, the download ones save it with a clear file name", async () => {
+  const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
+  const resume = html.match(/<a [^>]*data-href="resume"[^>]*>/g);
+  const downloads = resume.filter((a) => /download=/.test(a));
+  assert.ok(downloads.length >= 2, "hero and contact both offer a download");
+  assert.ok(downloads.every((a) => a.includes('download="Sushant-Mudalgi-Resume.pdf"')));
+  assert.ok(resume.some((a) => !/download/.test(a) && /target="_blank"/.test(a)), "a view link opens in a new tab");
+  assert.ok(resume.every((a) => a.includes('href="assets/resume.pdf"')));
+});
+
 test("static links are filled in and the step is repeatable", () => {
   const html = '<a data-href="github" href="#">GitHub</a><p data-text="location"></p>';
   const once = fillStatic(html, profile);
