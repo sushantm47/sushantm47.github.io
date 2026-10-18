@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { test } from "node:test";
-import { analyticsTag, description, eduHtml, escapeHtml, fillStatic, headTags, moreHtml, rolesHtml, statsHtml, tilesHtml, heroHtml, replaceBlock, sitemap, stampHtml, stampImports } from "../scripts/prerender.mjs";
+import { analyticsTag, description, eduHtml, escapeHtml, fillStatic, headTags, rolesHtml, statsHtml, tilesHtml, heroHtml, replaceBlock, sitemap, stampHtml, stampImports } from "../scripts/prerender.mjs";
 
 const profile = JSON.parse(await readFile(new URL("../data/profile.json", import.meta.url), "utf8"));
 
@@ -96,7 +96,7 @@ test("the page's Content Security Policy allows the analytics beacon and nothing
 
 test("the whole page is readable without JavaScript", async () => {
   const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
-  for (const text of ["OpsPilot", "DealRadar", "DNS simulation", "Data Engineer L4", "at Takeda", "at EY GDS",
+  for (const text of ["RootCite", '"alternateName":"OpsPilot"', "DealRadar", "Recent activity", "Data Engineer L4", "at Takeda", "at EY GDS",
     "Northeastern University", "15+", "Let's build something dependable."]) {
     assert.ok(html.includes(text), `missing from static HTML: ${text}`);
   }
@@ -106,7 +106,6 @@ test("the whole page is readable without JavaScript", async () => {
 
 test("prerendered sections match the profile and escape its text", () => {
   assert.equal((tilesHtml(profile).match(/class="tile"/g) || []).length, profile.projects.filter((p) => p.featured !== false).length);
-  assert.equal((moreHtml(profile).match(/<li /g) || []).length, profile.projects.filter((p) => p.featured === false).length);
   assert.equal((rolesHtml(profile).match(/class="role"/g) || []).length, profile.experience.length);
   assert.equal((statsHtml(profile).match(/<dt>/g) || []).length, profile.stats.length);
   assert.match(eduHtml(profile), /GPA 3\.91 \/ 4\.00/);

@@ -39,7 +39,7 @@ question ─> BM25 search over knowledge.json ─> top matching excerpts
 | Interaction | Scroll reveal, count-up stats, scroll-spy nav, an ask box that docks into the nav, lazy-loaded data |
 | Retrieval | BM25 search and markdown chunking, shared by the browser and the server |
 | LLM service | Cloudflare Worker calling an OpenAI-compatible API |
-| Live data | GitHub REST API for repo stats and recent activity |
+| Live data | GitHub REST API for project stats and the Recent activity feed |
 | Hosting | GitHub Pages, deployed by GitHub Actions |
 | Analytics | Cloudflare Web Analytics (cookie-free) |
 | Search engines | Page text, meta tags, and JSON-LD rendered into the HTML at build time |

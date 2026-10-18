@@ -1,19 +1,22 @@
 /* Dark by default. Gold is the signature accent (logo brackets, citations, impact numbers);
    each project tile brings its own color. */
 :root {
-  --bg: #0b1120;
-  --surface: #111a2e;
-  --surface-2: #18233c;
-  --ink: #e6ecf5;
-  --muted: #94a3b8;
-  --rule: #24324d;
-  --mark: #f4c95d;
-  --mark-ink: #0b1120;
+  --bg: #0c0c0e;
+  --surface: #151517;
+  --surface-2: #1d1d21;
+  --ink: #ededf0;
+  --muted: #a1a1aa;
+  --rule: #2a2a30;
+  --mark: #d97f8f;          /* wine tint: accent text and lines on dark */
+  --mark-ink: #f7eef0;
+  --fill: #7b2235;          /* burgundy: filled accents */
+  --fill-hover: #922a41;
+  --on-fill: #f7eef0;
   --ok: #3dd68c;
   --shadow: 0 24px 60px rgb(2 6 18 / 0.55);
-  --sans: "Schibsted Grotesk", system-ui, sans-serif;
-  --serif: "Newsreader", Georgia, serif;
-  --mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  --sans: "Geist", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --serif: "Geist", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "Geist Mono", ui-monospace, Menlo, Consolas, monospace;
   --measure: 66ch;
   --gutter: clamp(1rem, 3.5vw, 2.5rem);
   --bar: 64px;
@@ -21,13 +24,16 @@
 }
 
 :root[data-theme="light"] {
-  --bg: #f3f5f9;
+  --bg: #f7f7f8;
   --surface: #ffffff;
-  --surface-2: #eef2f7;
-  --ink: #0f172a;
-  --muted: #56657a;
-  --rule: #d6dee8;
-  --mark: #e9b949;
+  --surface-2: #efeff1;
+  --ink: #18181b;
+  --muted: #63636b;
+  --rule: #e4e4e7;
+  --mark: #8a1f37;
+  --fill: #7b2235;
+  --fill-hover: #922a41;
+  --on-fill: #ffffff;
   --ok: #12a150;
   --shadow: 0 24px 60px rgb(15 23 42 / 0.16);
   color-scheme: light;
@@ -51,7 +57,7 @@ img { max-width: 100%; height: auto; }
 [hidden] { display: none !important; }
 
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-.skip { position: absolute; left: -999px; top: 0.5rem; z-index: 60; background: var(--mark); color: var(--mark-ink); padding: 0.5rem 1rem; }
+.skip { position: absolute; left: -999px; top: 0.5rem; z-index: 60; background: var(--fill); color: var(--on-fill); padding: 0.5rem 1rem; }
 .skip:focus { left: 0.5rem; }
 
 /* ----- buttons, links, chips ----- */
@@ -60,7 +66,7 @@ img { max-width: 100%; height: auto; }
   display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
   font: 700 0.98rem var(--sans); text-decoration: none; cursor: pointer;
   padding: 0.75rem 1.2rem; border: 0; border-radius: 12px;
-  background: var(--mark); color: var(--mark-ink);
+  background: var(--fill); color: var(--on-fill);
   transition: transform 160ms ease, filter 160ms ease;
 }
 .button:hover { transform: translateY(-1px); filter: brightness(1.05); }
@@ -220,7 +226,7 @@ section { padding-top: clamp(5rem, 11vw, 8rem); }
 .steps li::before {
   content: counter(step); position: absolute; left: 0; top: 0.05rem;
   width: 1.75rem; height: 1.75rem; display: grid; place-items: center; border-radius: 8px;
-  font: 800 0.85rem var(--sans); background: var(--mark); color: var(--mark-ink);
+  font: 800 0.85rem var(--sans); background: var(--fill); color: var(--on-fill);
 }
 .steps strong { font-family: var(--sans); }
 
@@ -274,7 +280,7 @@ section { padding-top: clamp(5rem, 11vw, 8rem); }
 .ask input::placeholder { color: var(--muted); }
 .ask form button {
   font: 700 1rem var(--sans); padding: 0.85rem 1.4rem; border: 0; border-radius: 12px; cursor: pointer;
-  background: var(--mark); color: var(--mark-ink);
+  background: var(--fill); color: var(--on-fill);
 }
 .ask form button:disabled { opacity: 0.55; cursor: progress; }
 .ask-suggestions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.9rem; }
@@ -297,7 +303,7 @@ section { padding-top: clamp(5rem, 11vw, 8rem); }
 .turn-notice { font: 0.85rem var(--sans); color: var(--muted); }
 .cite {
   font: 700 0.72em var(--sans); vertical-align: 0.35em; text-decoration: none;
-  background: var(--mark); color: var(--mark-ink); padding: 0.05em 0.4em; margin-left: 0.15em; border-radius: 4px;
+  background: var(--fill); color: var(--on-fill); padding: 0.05em 0.4em; margin-left: 0.15em; border-radius: 4px;
 }
 .turn-sources { font: 0.88rem var(--sans); color: var(--muted); margin: 0.5rem 0 0; padding-left: 1.4rem; }
 .turn-sources li::marker { color: var(--mark); font-weight: 700; }
@@ -355,6 +361,7 @@ section { padding-top: clamp(5rem, 11vw, 8rem); }
 .case > :not(.case-art) { margin-left: clamp(1.25rem, 4vw, 2.5rem); margin-right: clamp(1.25rem, 4vw, 2.5rem); }
 .case .tile-kicker { margin-top: 1.6rem; }
 .case h2 { font-size: clamp(1.9rem, 4vw, 2.6rem); font-weight: 800; letter-spacing: -0.03em; margin: 0.3rem 0 0.6rem; }
+.case-note { font: 0.85rem var(--sans); color: var(--muted); margin-top: 0.4rem; }
 .case-summary { font-size: 1.15rem; max-width: 60ch; margin: 0 0 1rem; }
 .case .tags { margin-bottom: 1rem; }
 .case h3 { font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem; }
@@ -398,7 +405,7 @@ section { padding-top: clamp(5rem, 11vw, 8rem); }
 /* ----- contact ----- */
 
 .contact { padding-bottom: 3rem; }
-.contact-box { background: var(--mark); color: var(--mark-ink); border-radius: 26px; padding: clamp(1.5rem, 5vw, 3rem); }
+.contact-box { background: var(--fill); color: var(--on-fill); border-radius: 26px; padding: clamp(1.5rem, 5vw, 3rem); }
 .contact-box .chip { border-color: color-mix(in srgb, var(--mark-ink) 30%, transparent); color: var(--mark-ink); }
 .contact-box .chip-dot { background: var(--mark-ink); }
 .contact-box > p { font-size: 1.15rem; max-width: 56ch; }
@@ -419,7 +426,7 @@ section { padding-top: clamp(5rem, 11vw, 8rem); }
   opacity: 0; transform: translate(-50%, 12px); transition: opacity 200ms, transform 200ms; pointer-events: none;
 }
 .toast.is-on { opacity: 1; transform: translate(-50%, 0); }
-.load-error { position: fixed; inset: auto 1rem 1rem; z-index: 80; padding: 1rem; background: var(--mark); color: var(--mark-ink); font-family: var(--sans); border-radius: 12px; }
+.load-error { position: fixed; inset: auto 1rem 1rem; z-index: 80; padding: 1rem; background: var(--fill); color: var(--on-fill); font-family: var(--sans); border-radius: 12px; }
 
 /* ----- motion ----- */
 
@@ -466,3 +473,80 @@ section { padding-top: clamp(5rem, 11vw, 8rem); }
 @media (max-width: 420px) {
   .bar .button-sm { display: none; }
 }
+
+/* ===== Premium layer: Geist typography, burgundy accents, quieter surfaces ===== */
+
+body { font: 400 1rem/1.7 var(--sans); letter-spacing: -0.006em; font-feature-settings: "ss01", "cv11"; }
+h1, h2, h3, h4 { font-weight: 600; letter-spacing: -0.025em; }
+.logo { font-family: var(--mono); font-weight: 600; }
+
+.button { font-weight: 600; border-radius: 10px; transition: transform 160ms ease, background-color 160ms ease; }
+.button:hover { background: var(--fill-hover); filter: none; }
+.button-ghost { background: transparent; color: var(--ink); }
+.button-ghost:hover { background: var(--surface-2); }
+
+/* Hero: a low burgundy glow and a faint dot grid that fades out. */
+.hero::before { background: var(--fill); opacity: 0.45; filter: blur(110px); }
+/* The second layer is a faint dot grid that fades toward the bottom, behind the content. */
+.hero::after {
+  inset: 0; width: auto; height: auto; border-radius: 0; filter: none; opacity: 1;
+  background: radial-gradient(color-mix(in srgb, var(--ink) 10%, transparent) 1px, transparent 1px) 0 0 / 28px 28px;
+  -webkit-mask-image: linear-gradient(to bottom, #000 30%, transparent 85%);
+  mask-image: linear-gradient(to bottom, #000 30%, transparent 85%);
+}
+.hero .wrap { position: relative; }
+.hero h1 { font-weight: 600; letter-spacing: -0.045em; line-height: 1.02; }
+.hero-name { font-weight: 500; color: var(--muted); letter-spacing: 0; }
+.accent { color: var(--mark); }
+:root[data-theme="light"] .accent { color: var(--fill); background: none; }
+.hero-intro { color: color-mix(in srgb, var(--ink) 78%, var(--muted)); }
+
+/* Stats: quiet numbers with a thin burgundy rule instead of colored figures. */
+.stats div { background: linear-gradient(180deg, var(--surface), transparent); border-top: 2px solid var(--fill); border-radius: 4px 4px 14px 14px; }
+.stats dt { color: var(--ink); font-weight: 600; letter-spacing: -0.03em; }
+
+/* Project tiles: one accent for every project, artwork lit by a burgundy glow. */
+.tile, .case-dialog { --tile: var(--mark); }
+.tile { border-radius: 20px; }
+.tile:hover { border-color: color-mix(in srgb, var(--fill) 70%, var(--rule)); }
+.tile-art, .case-art {
+  color: color-mix(in srgb, var(--ink) 82%, transparent);
+  background:
+    radial-gradient(120% 90% at 85% 10%, color-mix(in srgb, var(--fill) 75%, transparent), transparent 60%),
+    linear-gradient(180deg, var(--surface-2), var(--surface));
+}
+.tile-title { font-weight: 600; }
+.case-result { border-left-color: var(--fill); }
+.flow li { border-color: color-mix(in srgb, var(--fill) 70%, var(--rule)); }
+
+.num { background: linear-gradient(transparent 62%, color-mix(in srgb, var(--fill) 70%, transparent) 62%); }
+.steps li::before { background: var(--fill); color: var(--on-fill); }
+.ask { border-color: color-mix(in srgb, var(--fill) 55%, var(--rule)); }
+.ask-suggestions button:hover, .dock:hover, .dock[aria-expanded="true"] { border-color: var(--fill); }
+
+/* Contact: a deep burgundy card. */
+.contact-box {
+  color: var(--on-fill);
+  background: radial-gradient(130% 150% at 0% 0%, var(--fill-hover), var(--fill) 45%, #3d1019);
+}
+.contact-box .chip { color: var(--on-fill); border-color: color-mix(in srgb, var(--on-fill) 35%, transparent); }
+.contact-box .chip-dot { background: var(--on-fill); }
+.contact-box .button { background: var(--on-fill); color: var(--fill); }
+.contact-box .text-link { color: var(--on-fill); }
+
+/* Recent activity, live from GitHub. */
+.activity { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--rule); }
+.activity > li { padding: 1.1rem 0 1.1rem 1.4rem; border-bottom: 1px solid var(--rule); position: relative; }
+.activity > li::before {
+  content: ""; position: absolute; left: 0; top: 1.55rem; width: 7px; height: 7px; border-radius: 50%;
+  background: var(--fill); box-shadow: 0 0 0 4px color-mix(in srgb, var(--fill) 25%, transparent);
+}
+.activity[aria-busy="true"]::after { content: "Loading activity…"; display: block; padding: 1rem 0; color: var(--muted); }
+.activity-head { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; }
+.activity-repo { font: 600 0.95rem var(--mono); text-decoration: none; color: var(--mark); }
+.activity-head time { font-size: 0.85rem; color: var(--muted); white-space: nowrap; }
+.activity-commit { display: block; margin: 0.25rem 0 0; font-weight: 500; text-decoration: none; }
+.activity-commit:hover { text-decoration: underline; }
+.activity-desc { margin: 0.25rem 0 0; color: var(--muted); font-size: 0.92rem; }
+.activity .meta { margin: 0.2rem 0 0; font: 0.8rem var(--mono); color: var(--muted); }
+.activity-more { margin: 1rem 0 0; }

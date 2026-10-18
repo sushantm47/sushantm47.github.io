@@ -1,0 +1,115 @@
+{
+ "recorded_with": "RootCite 0.4.0, deterministic offline planner",
+ "scenario": 0,
+ "scenarios": [
+  {
+   "service": "checkout-api",
+   "title": "p99 latency above 2s and 5xx errors rising",
+   "description": "Latency and 5xx alarms fired within 10 minutes of each other."
+  },
+  {
+   "service": "payments-worker",
+   "title": "Consumer lag growing on settlement-consumers",
+   "description": "Lag has increased for 60 minutes and settlement is delayed."
+  },
+  {
+   "service": "search-service",
+   "title": "Pods restarting repeatedly, OOMKilled",
+   "description": "Restart count increasing; memory near limit."
+  },
+  {
+   "service": "auth-gateway",
+   "title": "TLS handshake failures on public endpoint",
+   "description": "Clients report certificate errors; error rate at 40%."
+  },
+  {
+   "service": "notification-service",
+   "title": "Health checks failing, writes erroring",
+   "description": "Errors mention no space left on device."
+  }
+ ],
+ "result": {
+  "alert_id": "recorded-1",
+  "service": "checkout-api",
+  "root_cause": "Symptoms match 'Database connection pool exhaustion > Symptoms' (runbooks/db-connection-pool-exhaustion.md). Recent deploy v2.14.0 is a likely trigger.",
+  "confidence": 0.55,
+  "citations": [
+   "E3",
+   "E1",
+   "E6",
+   "E7"
+  ],
+  "recommended_actions": [
+   "If a deploy in the last few hours changed pool settings, roll back that deploy.",
+   "If no deploy is involved, temporarily raise the pool size within the database's max_connections budget.",
+   "Kill long-running idle-in-transaction sessions older than 5 minutes."
+  ],
+  "needs_human": true,
+  "grounded": true,
+  "warnings": [
+   "possible prompt injection in search_logs output; review manually"
+  ],
+  "tools_called": [
+   "list_recent_deploys",
+   "search_logs"
+  ],
+  "blocked_actions": [],
+  "evidence": [
+   {
+    "evidence_id": "E1",
+    "kind": "knowledge_base",
+    "source": "postmortems/2026-03-checkout-pool-exhaustion.md",
+    "section": "Postmortem: checkout-api outage from connection pool exhaustion (March 2026) > Timeline",
+    "flagged": false
+   },
+   {
+    "evidence_id": "E2",
+    "kind": "knowledge_base",
+    "source": "postmortems/2026-03-checkout-pool-exhaustion.md",
+    "section": "Postmortem: checkout-api outage from connection pool exhaustion (March 2026) > What went wrong",
+    "flagged": false
+   },
+   {
+    "evidence_id": "E3",
+    "kind": "knowledge_base",
+    "source": "runbooks/db-connection-pool-exhaustion.md",
+    "section": "Database connection pool exhaustion > Symptoms",
+    "flagged": false
+   },
+   {
+    "evidence_id": "E4",
+    "kind": "knowledge_base",
+    "source": "runbooks/db-connection-pool-exhaustion.md",
+    "section": "Database connection pool exhaustion > Mitigation",
+    "flagged": false
+   },
+   {
+    "evidence_id": "E5",
+    "kind": "knowledge_base",
+    "source": "runbooks/memory-leak-oomkilled.md",
+    "section": "Memory leak and OOMKilled pods > Symptoms",
+    "flagged": false
+   },
+   {
+    "evidence_id": "E6",
+    "kind": "tool",
+    "source": "list_recent_deploys",
+    "section": "checkout-api",
+    "flagged": false
+   },
+   {
+    "evidence_id": "E7",
+    "kind": "tool",
+    "source": "search_logs",
+    "section": "checkout-api",
+    "flagged": true
+   }
+  ],
+  "usage": {
+   "input_tokens": 1458,
+   "output_tokens": 180
+  },
+  "latency_ms": 1.1,
+  "cached": false
+ }
+}

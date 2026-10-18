@@ -40,14 +40,14 @@ test("buildKnowledge adds README chunks and survives missing files", async () =>
   const fakeFetch = async (url) =>
     url.includes("api.github.com/users/")
       ? Response.json([])
-      : url.endsWith("opspilot/HEAD/README.md")
-      ? new Response("# OpsPilot\nHybrid search.\n## Guardrails\nPrompt injection defense.")
+      : url.endsWith("rootcite/HEAD/README.md")
+      ? new Response("# RootCite\nHybrid search.\n## Guardrails\nPrompt injection defense.")
       : url.endsWith("DealRadar/HEAD/readme.md")
         ? new Response("# DealRadar\nFlask and MySQL price tracker.")
         : new Response("missing", { status: 404, statusText: "Not Found" });
   const quiet = { info() {}, warn() {} };
   const k = await buildKnowledge(profile, { fetchImpl: fakeFetch, log: quiet });
-  const readme = k.chunks.filter((c) => c.source.endsWith("opspilot/README.md"));
+  const readme = k.chunks.filter((c) => c.source.endsWith("rootcite/README.md"));
   assert.equal(readme.length, 2);
   assert.ok(readme[1].url.includes("/blob/HEAD/README.md"));
   const lower = k.chunks.filter((c) => c.source === "sushantm47/DealRadar/readme.md");
@@ -56,7 +56,7 @@ test("buildKnowledge adds README chunks and survives missing files", async () =>
 });
 
 const apiRepos = [
-  { name: "OpsPilot-agent", full_name: "sushantm47/OpsPilot-agent", fork: false, archived: false, private: false, html_url: "https://github.com/sushantm47/OpsPilot-agent", description: "Agentic RAG", language: "Python", topics: ["rag"] },
+  { name: "RootCite-agent", full_name: "sushantm47/RootCite-agent", fork: false, archived: false, private: false, html_url: "https://github.com/sushantm47/RootCite-agent", description: "Agentic RAG", language: "Python", topics: ["rag"] },
   { name: "DealRadar", full_name: "sushantm47/DealRadar", fork: false, archived: false, private: false, html_url: "https://github.com/sushantm47/DealRadar" },
   { name: "new-idea", full_name: "sushantm47/new-idea", fork: false, archived: false, private: false, html_url: "https://github.com/sushantm47/new-idea", description: "A brand new project", language: "Go" },
   { name: "someone-elses", full_name: "sushantm47/someone-elses", fork: true, archived: false, private: false, html_url: "x" },
@@ -65,11 +65,11 @@ const apiRepos = [
 ];
 
 test("auto-discovery skips forks, archived repos, and the site itself", () => {
-  assert.deepEqual(selectRepos(apiRepos, "sushantm47").map((r) => r.name), ["OpsPilot-agent", "DealRadar", "new-idea"]);
+  assert.deepEqual(selectRepos(apiRepos, "sushantm47").map((r) => r.name), ["RootCite-agent", "DealRadar", "new-idea"]);
 });
 
 test("a mistyped featured repo gets a suggestion", () => {
-  assert.equal(suggestRepo("sushantm47/opspilot", apiRepos), "sushantm47/OpsPilot-agent");
+  assert.equal(suggestRepo("sushantm47/rootcite", apiRepos), "sushantm47/RootCite-agent");
   assert.equal(suggestRepo("sushantm47/dealradar", apiRepos), "sushantm47/DealRadar");
   assert.equal(suggestRepo("sushantm47/nothing-like-it", apiRepos), undefined);
 });
@@ -85,8 +85,8 @@ test("every public repo is added to the knowledge, and wrong names are reported"
   const k = await buildKnowledge(profile, { fetchImpl: fakeFetch, log });
   const titles = k.chunks.map((c) => c.title);
   assert.ok(titles.includes("Repository: new-idea"));
-  assert.ok(titles.includes("Repository: OpsPilot-agent"), "unmatched real repos still get indexed");
+  assert.ok(titles.includes("Repository: RootCite-agent"), "unmatched real repos still get indexed");
   assert.ok(!titles.includes("Repository: DealRadar"), "featured repos aren't duplicated");
   assert.ok(!titles.some((t) => t.includes("someone-elses") || t.includes("old-portfolio")));
-  assert.ok(warnings.some((w) => w.includes('Did you mean "sushantm47/OpsPilot-agent"')));
+  assert.ok(warnings.some((w) => w.includes('Did you mean "sushantm47/RootCite-agent"')));
 });

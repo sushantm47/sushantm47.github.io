@@ -28,7 +28,7 @@ test("every skill 'used in' name links to a project or a job on the page", () =>
   for (const g of skillGroups(profile)) {
     for (const name of g.used_in || []) assert.ok(anchorFor(name, profile), `${g.group}: ${name}`);
   }
-  assert.equal(anchorFor("OpsPilot", profile), "#project-opspilot");
+  assert.equal(anchorFor("RootCite", profile), "#project-rootcite");
   assert.equal(anchorFor("EY GDS", profile), "#exp-ey-gds");
   assert.equal(anchorFor("Nowhere", profile), null);
   assert.deepEqual(skillGroups({ skills: { A: ["x"] } }), [{ group: "A", items: ["x"], used_in: [] }]);
@@ -40,7 +40,7 @@ test("case studies are complete and searchable by the assistant", () => {
   for (const p of featured) {
     for (const key of ["problem", "approach", "result"]) assert.ok(p.case_study?.[key], `${p.name}.${key}`);
   }
-  const chunk = profileToChunks(profile).find((c) => c.title === "Case study: OpsPilot");
+  const chunk = profileToChunks(profile).find((c) => c.title === "Case study: RootCite");
   assert.match(chunk.text, /Decision: Hybrid search/);
   assert.match(chunk.text, /Retrieve \(/);
 });

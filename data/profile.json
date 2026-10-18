@@ -50,15 +50,15 @@
     "endpoint": "https://portfolio-chat.sushantmudalgi99.workers.dev",
     "suggestions": [
       "What has {first} built in production?",
-      "How does OpsPilot avoid made-up answers?",
+      "What's {first}'s strongest project?",
       "What roles is {first} looking for, and when can {first} start?"
     ]
   },
   "projects": [
     {
-      "name": "OpsPilot",
-      "repo": "sushantm47/opspilot",
-      "summary": "An agentic RAG copilot for on-call incident response. Given an alert, it searches runbooks and past postmortems, checks deploys, metrics, and logs through tool calls, and returns a diagnosis that cites its evidence.",
+      "name": "RootCite",
+      "repo": "sushantm47/rootcite",
+      "summary": "Evidence-cited root-cause analysis for production alerts, previously named OpsPilot. Given an alert, an agent searches runbooks and past postmortems, checks deploys, metrics, and logs through tool calls, and returns a diagnosis that cites its evidence.",
       "outcome": "Hybrid search (BM25 + dense vectors, fused with RRF) reached 1.000 hit@5 and 1.000 MRR on a golden dataset, versus 0.909 MRR for either method alone, enforced by a CI gate. A deterministic verifier drops made-up citations, logs are screened for prompt injection, and actions that change production need human approval.",
       "stack": [
         "Python",
@@ -72,7 +72,7 @@
         "docs/DESIGN.md"
       ],
       "featured": true,
-      "kind": "Solo project",
+      "kind": "Solo project, previously named OpsPilot",
       "case_study": {
         "problem": "When a production alarm fires, on-call engineers often spend the first 15 to 30 minutes just connecting it to a recent deploy, a moving metric, and the right runbook. The knowledge exists, but it's scattered across docs, dashboards, and logs.",
         "approach": "An agent that works like a careful on-call engineer: it retrieves relevant runbooks and past postmortems, investigates live signals with read-only tools, writes a structured diagnosis, and has that diagnosis checked by code before anyone sees it.",
@@ -105,7 +105,7 @@
           },
           {
             "title": "Logs are treated as untrusted input",
-            "detail": "Log lines can contain text written by attackers. OpsPilot flags prompt-injection attempts, redacts secrets and card numbers before the model sees them, and never runs an action that changes production without human approval."
+            "detail": "Log lines can contain text written by attackers. RootCite flags prompt-injection attempts, redacts secrets and card numbers before the model sees them, and never runs an action that changes production without human approval."
           },
           {
             "title": "A state machine instead of an agent framework",
@@ -116,7 +116,12 @@
       },
       "color": "#F5A524",
       "art": "flow",
-      "tagline": "An AI copilot that diagnoses production alerts and cites its evidence."
+      "tagline": "Root-cause analysis for production alerts, with every claim cited.",
+      "previous_name": "OpsPilot",
+      "demo": {
+        "page": "rootcite/",
+        "api": "https://rootcite-g0bx.onrender.com"
+      }
     },
     {
       "name": "DealRadar",
@@ -308,7 +313,7 @@
       "used_in": [
         "Takeda",
         "EY GDS",
-        "OpsPilot"
+        "RootCite"
       ]
     },
     {
@@ -326,7 +331,7 @@
         "CI/CD (Jenkins, GitHub Actions)"
       ],
       "used_in": [
-        "OpsPilot",
+        "RootCite",
         "DealRadar",
         "Kalpas Innovations"
       ]
@@ -360,12 +365,24 @@
         "Pandas and NumPy"
       ],
       "used_in": [
-        "OpsPilot",
+        "RootCite",
         "Deloitte USI"
       ]
     }
   ],
   "faq": [
+    {
+      "q": "What has {first} built in production?",
+      "a": "{first} has built production data pipelines for regulated pharmaceutical reporting at Takeda and EY, and data warehouses at Deloitte. At Takeda (May 2025 to Aug 2025), {first} maintained 15+ production PySpark pipelines on Databricks across North America and Europe, with secure ingestion through Unity Catalog and AWS. At EY GDS (Nov 2024 to Apr 2025), {first} built 15 real-time and batch pipelines processing 200 to 300 GB, designed 30+ Delta Lake tables, and cut workflow costs by 25% by migrating orchestration from AWS Step Functions to Tidal. At Deloitte USI (Sep 2021 to Nov 2024), {first} designed Amazon Redshift data models with Tableau dashboards and led the migration of Talend ETL jobs to AWS Glue. At Kalpas Innovations (2021), {first} built a React.js front end for a platform with 5,000+ monthly active users. RootCite and DealRadar are personal projects, not production systems."
+    },
+    {
+      "q": "What is {first}'s strongest project?",
+      "a": "RootCite (previously named OpsPilot), a personal project: an agentic RAG copilot for on-call incident response. Given an alert, it searches runbooks and past postmortems, checks deploys, metrics, and logs through tool calls, and returns a diagnosis that cites its evidence. Hybrid search (BM25 plus dense vectors, fused with Reciprocal Rank Fusion) reached 1.000 hit@5 and 1.000 MRR on a golden dataset, versus 0.909 MRR for either method alone, enforced as a CI quality gate. It also detects prompt injection in logs, redacts secrets and PII, and requires human approval for actions that change production."
+    },
+    {
+      "q": "Which cloud and data tools has {first} used at work?",
+      "a": "At Takeda and EY: PySpark, Databricks (Delta Lake, Unity Catalog, Delta Marketplace), and AWS (S3, DMS, Step Functions, Lambda, EventBridge), with Tidal for orchestration. At Deloitte: Amazon Redshift, AWS Glue, Talend, and Tableau."
+    },
     {
       "q": "When can {first} start?",
       "a": "{first} graduates from Northeastern in May 2027 and is open to co-op roles before then and full-time roles after."

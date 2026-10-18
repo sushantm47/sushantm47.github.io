@@ -1,0 +1,21 @@
+name: Evaluate assistant
+
+# Run from the Actions tab (Run workflow) after changing the prompt, the model, or
+# profile.json. Asks the live assistant the questions in data/assistant-evals.json and
+# writes a pass/fail report with every answer to the run's summary page.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  eval:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Ask the assistant the recruiter questions
+        run: node scripts/eval-assistant.mjs

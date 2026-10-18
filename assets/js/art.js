@@ -1,11 +1,12 @@
 // Project tile artwork, drawn in code so there are no image files to load.
-// Each drawing uses only presentation attributes (no inline styles) so it passes the CSP.
+// Each drawing uses only presentation attributes (no inline styles) so it passes the CSP, and
+// strokes use currentColor so the stylesheet controls their color in both themes.
 
-const INK = "#0B1120";
+const INK = "currentColor";
 const S = `fill="none" stroke="${INK}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"`;
 
 const ART = {
-  // OpsPilot: an alert flowing through four agent steps to a verified check.
+  // RootCite: an alert flowing through four agent steps to a verified check.
   flow: `
     <path d="M36 70 L56 36 L76 70 Z" ${S}/><path d="M56 49 L56 58" ${S}/><circle cx="56" cy="64" r="1.5" fill="${INK}"/>
     <rect x="30" y="112" width="68" height="46" rx="10" ${S}/>

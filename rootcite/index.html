@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RootCite live demo | Sushant Mudalgi</title>
+  <meta name="description" content="Try RootCite: evidence-cited root-cause analysis for production alerts. Pick an incident and watch an AI agent investigate, cite its evidence, and flag a prompt-injection attempt.">
+  <link rel="canonical" href="https://sushantm47.github.io/rootcite/">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://*.onrender.com">
+  <meta name="theme-color" content="#0C0C0E">
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@500;600&display=swap">
+  <link rel="stylesheet" href="../assets/css/rootcite-demo.css">
+  <script type="module" src="../assets/js/rootcite-demo.js"></script>
+</head>
+<body>
+  <header class="wrap top">
+    <a class="logo" href="../" aria-label="Sushant Mudalgi, portfolio"><span class="b">&lt;</span>SM<span class="b">/&gt;</span></a>
+    <a class="back" href="../#work">Back to portfolio</a>
+  </header>
+
+  <main class="wrap">
+    <p class="kicker">RootCite live demo</p>
+    <h1>Diagnose a production alert with an agent that cites its evidence.</h1>
+    <p class="lede">Pick an incident. RootCite searches runbooks and past postmortems, checks recent deploys,
+      metrics, and logs through tool calls, and returns a diagnosis where every claim cites its evidence.
+      Code verifies the citations, and actions that would change production are held for human approval.</p>
+    <p class="links"><a id="repo" href="https://github.com/sushantm47/rootcite">Source on GitHub</a></p>
+
+    <div class="status" id="status" role="status" aria-live="polite">
+      <span class="dot" aria-hidden="true"></span>
+      <span id="status-text">Starting the demo server…</span>
+      <span class="bar" aria-hidden="true"><span id="status-bar"></span></span>
+    </div>
+
+    <div class="grid">
+      <section class="panel" aria-labelledby="pick-title">
+        <h2 id="pick-title">1. Choose an incident</h2>
+        <div class="scenarios" id="scenarios"></div>
+        <form id="form">
+          <h2>2. Or edit the alert</h2>
+          <label for="service">Service</label>
+          <select id="service" required></select>
+          <label for="title">Alert title</label>
+          <input id="title" maxlength="300" required>
+          <label for="description">Description</label>
+          <textarea id="description" maxlength="4000"></textarea>
+          <button class="run" id="run" type="submit" disabled>Waiting for the server…</button>
+          <p class="note">The checkout-api logs contain a planted prompt-injection attempt. Watch the
+            guardrails flag it.</p>
+        </form>
+      </section>
+
+      <section class="panel" aria-labelledby="result-title" aria-live="polite">
+        <h2 id="result-title">3. Diagnosis</h2>
+        <p class="banner" id="banner"></p>
+        <div id="result"></div>
+      </section>
+    </div>
+
+    <p class="foot">Runs on sample telemetry for five fictional services. The demo server sleeps when idle
+      and takes about a minute to start; live runs are limited per visitor and per day.</p>
+  </main>
+</body>
+</html>

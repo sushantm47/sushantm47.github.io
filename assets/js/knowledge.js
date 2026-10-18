@@ -33,7 +33,6 @@ export function profileToChunks(profile) {
       profile.intro,
       profile.previously?.length && `Previously at ${joinList(employerNames(profile))}.`,
       profile.availability && `Availability: ${profile.availability}.`,
-      ...(profile.stats || []).map((st) => `${st.value} ${st.label}.`),
       `Location: ${profile.location}.`,
       `Currently: ${profile.status}`,
       `Contact: email ${links.email}; GitHub ${githubUrl(profile)}; LinkedIn ${links.linkedin}.`,
@@ -46,7 +45,13 @@ export function profileToChunks(profile) {
     add(
       `project-${slug(p.name)}`,
       `Project: ${p.name}`,
-      [p.summary, p.outcome && `Results: ${p.outcome}`, `Tech stack: ${(p.stack || []).join(", ")}.`, `Code: ${repoUrl(p)}`]
+      [
+        p.summary,
+        p.outcome && `Results: ${p.outcome}`,
+        `Tech stack: ${(p.stack || []).join(", ")}.`,
+        `Code: ${repoUrl(p)}`,
+        p.demo?.page && `Live demo: ${new URL(p.demo.page, profile.site_url || "https://example.com/").href}`,
+      ]
         .filter(Boolean)
         .join("\n"),
       repoUrl(p)

@@ -61,11 +61,13 @@ The same module runs in three places: the build script, the Worker, and the brow
 
 `worker/src/index.js` is a Cloudflare Worker. For each question it:
 
-1. Loads `knowledge.json` from the site (cached for 10 minutes) and retrieves the top 6
+1. Loads `knowledge.json` from the site (cached for 10 minutes) and retrieves the top 8
    chunks.
-2. Sends them to the LLM with strict rules: answer only from the numbered context, cite
-   with `[1]`, `[2]`, say "I don't know" otherwise, stay under about 120 words, refer to
-   me in the third person, and decline unrelated requests.
+2. Sends them to the LLM with rules written for the real audience, recruiters: open with a
+   direct answer; give each work point with its employer, dates, and measurable result;
+   copy numbers exactly; cite after every point; label personal projects as personal and
+   never as production systems; no filler; answer only from the context, otherwise say so;
+   decline unrelated requests.
 3. Returns the answer plus a source list, which the page turns into highlighted citation
    marks linked to the repo or file.
 
@@ -78,6 +80,24 @@ Models are tried in order, and the first good answer wins:
 
 A provider that's rate limited, out of its free quota, or rejects its key is skipped. The
 response records which model answered, which helps when debugging.
+
+### Curated answers
+
+`profile.json` includes hand-written answers to the questions recruiters ask most ("What
+has Sushant built in production?", "What's his strongest project?", "Which tools has he
+used at work?"). They're indexed like everything else, so retrieval matches them directly
+and the model starts from a complete, accurate answer instead of stitching fragments
+together. Shortened display numbers (like the "200+ GB" stat card) are kept out of the
+context, so answers use the exact figures from the job entries.
+
+### Evaluation
+
+`data/assistant-evals.json` holds recruiter questions with facts each answer must contain
+(employer names, exact numbers), mistakes it must avoid (rounded numbers, calling a
+personal project production), and whether it must cite. The **Evaluate assistant**
+workflow runs them against the live assistant with one click and writes a pass/fail report,
+with every answer, to the run's summary page. It fails below an 80% pass rate. Run it after
+changing the prompt, the model, or the profile.
 
 ### 4. Fallback
 
@@ -116,8 +136,8 @@ sources. The assistant never shows an error page.
 
 - **No framework, no bundler:** plain HTML, CSS, and JavaScript modules.
 - **Lazy loading:** the assistant's knowledge file downloads only when a visitor hovers,
-  focuses, or taps the ask box. Extra GitHub repos load only when "More projects" is
-  about to scroll into view.
+  focuses, or taps the ask box. The Recent activity feed (the newest commit in each
+  recently pushed repository) loads only when its section is about to scroll into view.
 - **Drawn, not downloaded:** project artwork is SVG generated in code, so there are no
   image files to fetch.
 - **Cache busting:** GitHub Pages lets browsers keep files for about 10 minutes. Without
@@ -142,6 +162,21 @@ into the HTML at build time, so crawlers and link previews never need to run any
   `SoftwareSourceCode` with its repository.
 - **Link previews:** Open Graph and Twitter tags with a 1200×630 preview image.
 - `sitemap.xml`, `robots.txt`, a canonical URL, and `max-image-preview:large`.
+
+## RootCite live demo
+
+`rootcite/` is a static demo page for RootCite, served by GitHub Pages so it loads instantly.
+RootCite's API runs on a free host that sleeps when idle, so the page:
+
+- shows a recorded diagnosis (`data/rootcite-example.json`) immediately;
+- wakes the API in the background with `GET /health`, which uses no model tokens, and shows
+  progress until it answers;
+- enables live runs once the API is ready, and falls back to the recorded example if the
+  API is unreachable or its daily budget of live runs is spent.
+
+The portfolio also sends that wake-up request when the work section scrolls into view and
+when the RootCite case study opens, so the API is usually awake by the time a visitor
+reaches the demo.
 
 ## Visitor analytics
 
@@ -177,7 +212,7 @@ are GitHub encrypted secrets, uploaded to Cloudflare as Worker secrets.
 
 ## Tests
 
-`npm test` runs 53 tests with Node's built-in test runner, covering retrieval and
+`npm test` runs 67 tests with Node's built-in test runner, covering retrieval and
 chunking, knowledge building and repo discovery, safe answer rendering, offline answers,
 the Worker (origin checks, validation, the three-model fallback chain, rate-limit handling),
 prerendering and escaping, cache busting, and layout helpers such as number highlighting

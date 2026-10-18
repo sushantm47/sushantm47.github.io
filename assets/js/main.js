@@ -47,8 +47,11 @@ async function main() {
   copyButtons(document.getElementById("toast"));
 
   // Lazy loading: GitHub data is fetched only when its section is about to be seen.
-  // Lazy loading: other public repos are fetched only when "More projects" is about to be seen.
-  whenNear(document.querySelector(".more"), () => loadMoreRepos(profile));
+  // Wake the sleeping demo server while visitors read the work section (no model tokens used).
+  whenNear(document.getElementById("tiles"), () => wakeDemos(profile), "200px");
+
+  // Lazy loading: GitHub activity is fetched only when its section is about to be seen.
+  whenNear(document.getElementById("activity"), () => loadActivity(profile));
 }
 
 function el(tag, attrs = {}, ...children) {
@@ -90,11 +93,6 @@ function renderProfile(p) {
   const tiles = document.getElementById("tiles");
   tiles.replaceChildren(); // replaces the prerendered copy with interactive tiles
   projects.filter((x) => x.featured !== false).forEach((project, i) => tiles.append(tile(project, i + 1, f)));
-  const more = document.getElementById("more-list");
-  more.replaceChildren();
-  for (const project of projects.filter((x) => x.featured === false)) {
-    more.append(moreRow({ name: project.name, text: f(project.tagline || project.summary), tags: project.stack, url: repoUrl(project), repo: project.repo }));
-  }
   initCaseDialog(p, f);
 
   const roles = document.getElementById("roles");
@@ -121,13 +119,6 @@ function renderProfile(p) {
       el("strong", { text: ed.degree }), `, ${ed.school}`,
       el("span", { class: "edu-meta", text: [`${ed.start} to ${ed.end}`, gpa].filter(Boolean).join(", ") })));
   }
-}
-
-function moreRow({ name, text, tags, url, repo }) {
-  return el("li", { "data-repo": repo || "", "data-reveal": "" },
-    el("a", { class: "more-name", href: url, target: "_blank", rel: "noopener", text: name }),
-    el("p", { text }),
-    tags?.length && el("ul", { class: "tags tags-sm" }, ...tags.slice(0, 3).map((t) => el("li", { text: t }))));
 }
 
 function renderHeadline(p) {
@@ -173,9 +164,22 @@ function tile(project, caseNumber, f) {
       el("span", { class: "tile-foot" },
         el("span", { class: "tile-tags", text: (project.stack || []).slice(0, 3).join(", ") }),
         el("span", { class: "tile-cta", text: project.case_study ? "Read case study" : "View code" }))));
-  node.style.setProperty("--tile", project.color || "#F4C95D");
   stagger(node, caseNumber - 1);
   return node;
+}
+
+// A demo hosted on a free plan sleeps when idle. A GET /health wakes it without using any
+// model tokens, so by the time a visitor opens the demo it is usually ready.
+export function wakeDemos(profile) {
+  for (const project of profile.projects || []) {
+    if (!project.demo?.api) continue;
+    const key = `woken:${project.demo.api}`;
+    try {
+      if (sessionStorage.getItem(key)) continue;
+      sessionStorage.setItem(key, "1");
+    } catch { /* storage unavailable: wake anyway */ }
+    fetch(`${project.demo.api.replace(/\/$/, "")}/health`, { mode: "no-cors", cache: "no-store" }).catch(() => {});
+  }
 }
 
 function initCaseDialog(profile, f) {
@@ -188,9 +192,9 @@ function initCaseDialog(profile, f) {
     if (!trigger) return;
     const project = (profile.projects || []).find((p) => p.name === trigger.dataset.case);
     if (!project?.case_study) return;
+    wakeDemos({ projects: [project] });
     opener = trigger;
     body.replaceChildren(caseStudy(project, f));
-    dialog.style.setProperty("--tile", project.color || "#F4C95D");
     dialog.showModal();
     document.documentElement.classList.add("is-locked");
     dialog.querySelector(".case-close").focus();
@@ -221,8 +225,10 @@ function caseStudy(project, f) {
     el("p", { class: "case-summary", text: f(project.summary) }),
     el("ul", { class: "tags tags-sm" }, ...(project.stack || []).map((s) => el("li", { text: s }))),
     el("p", { class: "tile-links" },
+      project.demo && el("a", { class: "button button-sm", href: project.demo.page, text: "Try the live demo" }),
       el("a", { class: "text-link strong", href: repoUrl(project), target: "_blank", rel: "noopener", text: "View the code" }),
       ask),
+    project.demo && el("p", { class: "case-note", text: "The demo server sleeps when idle. If it's asleep, the demo page wakes it, usually in under a minute, and shows a recorded example meanwhile." }),
     el("div", { class: "case-result" }, el("h3", { text: "Result" }), withNumbers(el("p"), f(cs.result))),
     el("div", { class: "case-grid" },
       el("div", {}, el("h3", { text: "Problem" }), el("p", { text: f(cs.problem) })),
@@ -291,22 +297,64 @@ function githubUser(profile) {
   return user && user !== PLACEHOLDER_USER ? user : null;
 }
 
-// Adds your other public repos (newest first) to "More projects".
-async function loadMoreRepos(profile) {
+// Recent activity: the newest commit in each recently pushed public repository. Read live
+// from GitHub's public API (no token), cached for the session, so the section stays current
+// without rebuilding the site.
+export function activityItems(repos, commitsByRepo, user, limit = 5) {
+  return repos
+    .filter((r) => !r.fork && !r.archived && r.name.toLowerCase() !== `${user}.github.io`.toLowerCase())
+    .map((r) => ({ repo: r, commit: commitsByRepo[r.full_name] }))
+    .filter((x) => x.commit)
+    .sort((a, b) => Date.parse(b.commit.date) - Date.parse(a.commit.date))
+    .slice(0, limit);
+}
+
+export function firstLine(message, max = 90) {
+  const line = String(message || "").split("\n")[0].trim();
+  return line.length > max ? `${line.slice(0, line.lastIndexOf(" ", max - 1))}…` : line;
+}
+
+async function loadActivity(profile) {
   const user = githubUser(profile);
-  if (!user) return;
+  const list = document.getElementById("activity-list");
+  const section = document.getElementById("activity");
+  if (!user) {
+    section.hidden = true;
+    return;
+  }
   try {
-    const shown = new Set((profile.projects || []).map((p) => p.repo.toLowerCase()));
-    const list = await gh(`/users/${user}/repos?sort=pushed&per_page=12`);
-    const target = document.getElementById("more-list");
-    const extra = list.filter((x) => !x.fork && !x.archived && !shown.has(x.full_name.toLowerCase())
-      && x.name.toLowerCase() !== `${user}.github.io`.toLowerCase()
-      && (x.description || "").trim().length >= 25); // skip repos without a real description
-    for (const r of extra.slice(0, 4)) {
-      target.append(moreRow({ name: r.name, text: r.description, tags: r.language ? [r.language] : [], url: r.html_url, repo: r.full_name }));
-    }
-    reveal(target);
-  } catch { /* the curated projects are enough */ }
+    const repos = (await gh(`/users/${user}/repos?sort=pushed&per_page=8`)).slice(0, 6);
+    const commitsByRepo = {};
+    await Promise.all(repos.map(async (r) => {
+      try {
+        const [latest] = await gh(`/repos/${r.full_name}/commits?per_page=1`);
+        if (latest) {
+          commitsByRepo[r.full_name] = {
+            message: latest.commit.message,
+            date: latest.commit.author?.date || latest.commit.committer?.date,
+            url: latest.html_url,
+          };
+        }
+      } catch { /* an empty or private repo is skipped */ }
+    }));
+    const items = activityItems(repos, commitsByRepo, user);
+    list.replaceChildren(...items.map(({ repo, commit }, i) => {
+      const item = el("li", { "data-reveal": "" },
+        el("div", { class: "activity-head" },
+          el("a", { class: "activity-repo", href: repo.html_url, target: "_blank", rel: "noopener", text: repo.name }),
+          el("time", { datetime: commit.date, text: relativeTime(commit.date) })),
+        el("a", { class: "activity-commit", href: commit.url, target: "_blank", rel: "noopener", text: firstLine(commit.message) }),
+        repo.description && el("p", { class: "activity-desc", text: repo.description }),
+        repo.language && el("p", { class: "meta", text: repo.language }));
+      stagger(item, i);
+      return item;
+    }));
+    list.removeAttribute("aria-busy");
+    if (!items.length) section.hidden = true;
+    reveal(list);
+  } catch {
+    section.hidden = true;
+  }
 }
 
 export function relativeTime(iso, now = Date.now()) {
@@ -329,7 +377,7 @@ function initTheme() {
   const apply = (theme) => {
     document.documentElement.dataset.theme = theme;
     button.setAttribute("aria-label", theme === "dark" ? "Switch to light mode" : "Switch to dark mode");
-    document.querySelector('meta[name="theme-color"]')?.setAttribute("content", theme === "dark" ? "#0B1120" : "#F3F5F9");
+    document.querySelector('meta[name="theme-color"]')?.setAttribute("content", theme === "dark" ? "#0C0C0E" : "#F7F7F8");
   };
   apply(saved === "light" ? "light" : "dark");
   button.addEventListener("click", () => {

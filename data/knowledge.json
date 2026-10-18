@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-12T23:24:43.257Z",
+ "generated_at": "2026-10-18T16:07:05.395Z",
  "owner": {
   "name": "Sushant Mudalgi",
   "first": "Sushant",
@@ -11,21 +11,21 @@
    "title": "About Sushant Mudalgi",
    "source": "profile",
    "url": "",
-   "text": "Sushant Mudalgi: Software engineer. I build dependable software, from data pipelines to APIs to AI agents.\nMS in Computer Science student at Northeastern with four years of industry experience. I've shipped production pipelines behind regulatory reporting, warehouses and dashboards for business teams, web front ends, and an AI incident-response agent that cites its evidence.\nPreviously at Takeda, EY, and Deloitte.\nAvailability: Open to co-op and full-time roles.\n4 years of industry experience.\n15+ production pipelines maintained at Takeda.\n200+ GB processed by pipelines I built at EY.\n25% workflow cost cut by an orchestration migration.\nLocation: Boston, MA.\nCurrently: Open to software engineering, data engineering, and AI engineering roles, including co-op and full-time positions. I graduate in May 2027.\nContact: email mudalgi.s@northeastern.edu; GitHub https://github.com/sushantm47; LinkedIn https://www.linkedin.com/in/sushant-mudalgi."
+   "text": "Sushant Mudalgi: Software engineer. I build dependable software, from data pipelines to APIs to AI agents.\nMS in Computer Science student at Northeastern with four years of industry experience. I've shipped production pipelines behind regulatory reporting, warehouses and dashboards for business teams, web front ends, and an AI incident-response agent that cites its evidence.\nPreviously at Takeda, EY, and Deloitte.\nAvailability: Open to co-op and full-time roles.\nLocation: Boston, MA.\nCurrently: Open to software engineering, data engineering, and AI engineering roles, including co-op and full-time positions. I graduate in May 2027.\nContact: email mudalgi.s@northeastern.edu; GitHub https://github.com/sushantm47; LinkedIn https://www.linkedin.com/in/sushant-mudalgi."
   },
   {
-   "id": "profile#project-opspilot",
-   "title": "Project: OpsPilot",
+   "id": "profile#project-rootcite",
+   "title": "Project: RootCite",
    "source": "profile",
-   "url": "https://github.com/sushantm47/opspilot",
-   "text": "An agentic RAG copilot for on-call incident response. Given an alert, it searches runbooks and past postmortems, checks deploys, metrics, and logs through tool calls, and returns a diagnosis that cites its evidence.\nResults: Hybrid search (BM25 + dense vectors, fused with RRF) reached 1.000 hit@5 and 1.000 MRR on a golden dataset, versus 0.909 MRR for either method alone, enforced by a CI gate. A deterministic verifier drops made-up citations, logs are screened for prompt injection, and actions that change production need human approval.\nTech stack: Python, FastAPI, Claude, PostgreSQL + pgvector, MCP, AWS CDK.\nCode: https://github.com/sushantm47/opspilot"
+   "url": "https://github.com/sushantm47/rootcite",
+   "text": "Evidence-cited root-cause analysis for production alerts, previously named OpsPilot. Given an alert, an agent searches runbooks and past postmortems, checks deploys, metrics, and logs through tool calls, and returns a diagnosis that cites its evidence.\nResults: Hybrid search (BM25 + dense vectors, fused with RRF) reached 1.000 hit@5 and 1.000 MRR on a golden dataset, versus 0.909 MRR for either method alone, enforced by a CI gate. A deterministic verifier drops made-up citations, logs are screened for prompt injection, and actions that change production need human approval.\nTech stack: Python, FastAPI, Claude, PostgreSQL + pgvector, MCP, AWS CDK.\nCode: https://github.com/sushantm47/rootcite\nLive demo: https://sushantm47.github.io/rootcite/"
   },
   {
-   "id": "profile#case-study-opspilot",
-   "title": "Case study: OpsPilot",
+   "id": "profile#case-study-rootcite",
+   "title": "Case study: RootCite",
    "source": "profile",
-   "url": "https://github.com/sushantm47/opspilot",
-   "text": "Problem: When a production alarm fires, on-call engineers often spend the first 15 to 30 minutes just connecting it to a recent deploy, a moving metric, and the right runbook. The knowledge exists, but it's scattered across docs, dashboards, and logs.\nApproach: An agent that works like a careful on-call engineer: it retrieves relevant runbooks and past postmortems, investigates live signals with read-only tools, writes a structured diagnosis, and has that diagnosis checked by code before anyone sees it.\nHow it works: Retrieve (Runbooks and postmortems, hybrid search), then Investigate (Deploys, metrics, logs via tool calls), then Synthesize (Forced structured output), then Verify (Citations and confidence checked in code).\nDecision: Hybrid search instead of embeddings alone. Incident text is full of exact identifiers like v2.14.0 and max.poll.interval.ms that embeddings blur. BM25 keyword search catches those, dense search catches paraphrases, and Reciprocal Rank Fusion combines them by rank with no score tuning.\nDecision: Code checks the model's citations. Everything the agent sees gets an evidence ID. A deterministic verifier drops citations that don't exist, caps confidence when an answer isn't backed by live telemetry, and escalates to a human when unsure.\nDecision: Logs are treated as untrusted input. Log lines can contain text written by attackers. OpsPilot flags prompt-injection attempts, redacts secrets and card numbers before the model sees them, and never runs an action that changes production without human approval.\nDecision: A state machine instead of an agent framework. Explicit steps with hard budgets on steps, tool calls, and tokens make every path unit-testable and put an upper bound on cost and latency.\nResult: 1.000 hit@5 and 1.000 MRR on a golden dataset with hybrid search, versus 0.909 MRR for either method alone, enforced as a CI quality gate. 65+ automated tests cover the agent, guardrails, and retrieval, and the AWS infrastructure is defined as code with CDK."
+   "url": "https://github.com/sushantm47/rootcite",
+   "text": "Problem: When a production alarm fires, on-call engineers often spend the first 15 to 30 minutes just connecting it to a recent deploy, a moving metric, and the right runbook. The knowledge exists, but it's scattered across docs, dashboards, and logs.\nApproach: An agent that works like a careful on-call engineer: it retrieves relevant runbooks and past postmortems, investigates live signals with read-only tools, writes a structured diagnosis, and has that diagnosis checked by code before anyone sees it.\nHow it works: Retrieve (Runbooks and postmortems, hybrid search), then Investigate (Deploys, metrics, logs via tool calls), then Synthesize (Forced structured output), then Verify (Citations and confidence checked in code).\nDecision: Hybrid search instead of embeddings alone. Incident text is full of exact identifiers like v2.14.0 and max.poll.interval.ms that embeddings blur. BM25 keyword search catches those, dense search catches paraphrases, and Reciprocal Rank Fusion combines them by rank with no score tuning.\nDecision: Code checks the model's citations. Everything the agent sees gets an evidence ID. A deterministic verifier drops citations that don't exist, caps confidence when an answer isn't backed by live telemetry, and escalates to a human when unsure.\nDecision: Logs are treated as untrusted input. Log lines can contain text written by attackers. RootCite flags prompt-injection attempts, redacts secrets and card numbers before the model sees them, and never runs an action that changes production without human approval.\nDecision: A state machine instead of an agent framework. Explicit steps with hard budgets on steps, tool calls, and tokens make every path unit-testable and put an upper bound on cost and latency.\nResult: 1.000 hit@5 and 1.000 MRR on a golden dataset with hybrid search, versus 0.909 MRR for either method alone, enforced as a CI quality gate. 65+ automated tests cover the agent, guardrails, and retrieval, and the AWS infrastructure is defined as code with CDK."
   },
   {
    "id": "profile#project-dealradar",
@@ -102,24 +102,45 @@
    "title": "Skills",
    "source": "profile",
    "url": "",
-   "text": "Languages: Python, SQL, Java, JavaScript, PySpark. Used at or in: Takeda, EY GDS, and OpsPilot.\nBackend and web: FastAPI, REST APIs, Flask, React.js, PostgreSQL, MySQL, MongoDB, Docker, Git and GitHub, CI/CD (Jenkins, GitHub Actions). Used at or in: OpsPilot, DealRadar, and Kalpas Innovations.\nData and cloud: Databricks (Delta Lake, Unity Catalog), Spark, AWS (S3, Glue, Redshift, Lambda, DMS, EventBridge, Step Functions), Snowflake, Airflow, Tidal, Talend, Tableau. Used at or in: Takeda, EY GDS, and Deloitte USI.\nAI and ML: RAG and hybrid search, LLM agents, tool use, and MCP, Evals and guardrails, scikit-learn, XGBoost, Pandas and NumPy. Used at or in: OpsPilot and Deloitte USI."
+   "text": "Languages: Python, SQL, Java, JavaScript, PySpark. Used at or in: Takeda, EY GDS, and RootCite.\nBackend and web: FastAPI, REST APIs, Flask, React.js, PostgreSQL, MySQL, MongoDB, Docker, Git and GitHub, CI/CD (Jenkins, GitHub Actions). Used at or in: RootCite, DealRadar, and Kalpas Innovations.\nData and cloud: Databricks (Delta Lake, Unity Catalog), Spark, AWS (S3, Glue, Redshift, Lambda, DMS, EventBridge, Step Functions), Snowflake, Airflow, Tidal, Talend, Tableau. Used at or in: Takeda, EY GDS, and Deloitte USI.\nAI and ML: RAG and hybrid search, LLM agents, tool use, and MCP, Evals and guardrails, scikit-learn, XGBoost, Pandas and NumPy. Used at or in: RootCite and Deloitte USI."
   },
   {
    "id": "profile#faq-0",
+   "title": "What has Sushant built in production?",
+   "source": "profile",
+   "url": "",
+   "text": "Sushant has built production data pipelines for regulated pharmaceutical reporting at Takeda and EY, and data warehouses at Deloitte. At Takeda (May 2025 to Aug 2025), Sushant maintained 15+ production PySpark pipelines on Databricks across North America and Europe, with secure ingestion through Unity Catalog and AWS. At EY GDS (Nov 2024 to Apr 2025), Sushant built 15 real-time and batch pipelines processing 200 to 300 GB, designed 30+ Delta Lake tables, and cut workflow costs by 25% by migrating orchestration from AWS Step Functions to Tidal. At Deloitte USI (Sep 2021 to Nov 2024), Sushant designed Amazon Redshift data models with Tableau dashboards and led the migration of Talend ETL jobs to AWS Glue. At Kalpas Innovations (2021), Sushant built a React.js front end for a platform with 5,000+ monthly active users. RootCite and DealRadar are personal projects, not production systems."
+  },
+  {
+   "id": "profile#faq-1",
+   "title": "What is Sushant's strongest project?",
+   "source": "profile",
+   "url": "",
+   "text": "RootCite (previously named OpsPilot), a personal project: an agentic RAG copilot for on-call incident response. Given an alert, it searches runbooks and past postmortems, checks deploys, metrics, and logs through tool calls, and returns a diagnosis that cites its evidence. Hybrid search (BM25 plus dense vectors, fused with Reciprocal Rank Fusion) reached 1.000 hit@5 and 1.000 MRR on a golden dataset, versus 0.909 MRR for either method alone, enforced as a CI quality gate. It also detects prompt injection in logs, redacts secrets and PII, and requires human approval for actions that change production."
+  },
+  {
+   "id": "profile#faq-2",
+   "title": "Which cloud and data tools has Sushant used at work?",
+   "source": "profile",
+   "url": "",
+   "text": "At Takeda and EY: PySpark, Databricks (Delta Lake, Unity Catalog, Delta Marketplace), and AWS (S3, DMS, Step Functions, Lambda, EventBridge), with Tidal for orchestration. At Deloitte: Amazon Redshift, AWS Glue, Talend, and Tableau."
+  },
+  {
+   "id": "profile#faq-3",
    "title": "When can Sushant start?",
    "source": "profile",
    "url": "",
    "text": "Sushant graduates from Northeastern in May 2027 and is open to co-op roles before then and full-time roles after."
   },
   {
-   "id": "profile#faq-1",
+   "id": "profile#faq-4",
    "title": "What kinds of roles is Sushant looking for?",
    "source": "profile",
    "url": "",
    "text": "Software engineering, data engineering, and AI engineering roles. Sushant has four years of production experience across data platforms, backend and web development, and applied AI."
   },
   {
-   "id": "profile#faq-2",
+   "id": "profile#faq-5",
    "title": "Where is Sushant based?",
    "source": "profile",
    "url": "",

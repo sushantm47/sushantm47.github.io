@@ -66,6 +66,7 @@ export function structuredData(p) {
   const projects = (p.projects || []).map((pr) => ({
     "@type": "SoftwareSourceCode",
     name: pr.name,
+    ...(pr.previous_name ? { alternateName: pr.previous_name } : {}),
     description: fill(pr.tagline || pr.summary, p),
     codeRepository: repoUrl(pr),
     programmingLanguage: (pr.stack || [])[0],
@@ -191,15 +192,6 @@ export function tilesHtml(p) {
     .join("\n");
 }
 
-export function moreHtml(p) {
-  return (p.projects || [])
-    .filter((x) => x.featured === false)
-    .map((pr) =>
-      `<li data-repo="${escapeHtml(pr.repo)}"><a class="more-name" href="${escapeHtml(repoUrl(pr))}" target="_blank" rel="noopener">${escapeHtml(pr.name)}</a>` +
-      `<p>${escapeHtml(fill(pr.tagline || pr.summary, p))}</p>${tagsHtml((pr.stack || []).slice(0, 3))}</li>`)
-    .join("\n");
-}
-
 export function statsHtml(p) {
   return (p.stats || []).map((st) => `<div><dt>${escapeHtml(st.value)}</dt><dd>${escapeHtml(st.label)}</dd></div>`).join("");
 }
@@ -252,10 +244,12 @@ export function replaceBlock(html, name, content) {
   return html.replace(pattern, (_, open, close) => `${open}\n  ${content}\n  ${close}`);
 }
 
-export function sitemap(url, date = new Date()) {
+export function sitemap(url, date = new Date(), extra = []) {
+  const day = date.toISOString().slice(0, 10);
+  const urls = [url, ...extra.map((path) => new URL(path, url).href)];
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>${escapeHtml(url)}</loc><lastmod>${date.toISOString().slice(0, 10)}</lastmod></url>
+${urls.map((u) => `  <url><loc>${escapeHtml(u)}</loc><lastmod>${day}</lastmod></url>`).join("\n")}
 </urlset>
 `;
 }
@@ -277,6 +271,10 @@ export async function assetVersion(root, files) {
   return hash.digest("hex").slice(0, 10);
 }
 
+export function demoPages(p) {
+  return (p.projects || []).map((pr) => pr.demo?.page).filter(Boolean);
+}
+
 async function main() {
   const root = new URL("../", import.meta.url);
   const profile = JSON.parse(await readFile(new URL("data/profile.json", root), "utf8"));
@@ -284,7 +282,6 @@ async function main() {
   html = replaceBlock(html, "head", headTags(profile));
   html = replaceBlock(html, "hero", heroHtml(profile));
   html = replaceBlock(html, "tiles", tilesHtml(profile));
-  html = replaceBlock(html, "more", moreHtml(profile));
   html = replaceBlock(html, "stats", statsHtml(profile));
   html = replaceBlock(html, "roles", rolesHtml(profile));
   html = replaceBlock(html, "edu", eduHtml(profile));
@@ -295,6 +292,10 @@ async function main() {
     const files = ["assets/css/style.css", ...jsFiles.map((f) => `assets/js/${f}`)];
     const version = await assetVersion(root, files);
     html = stampHtml(html, version);
+    for (const page of demoPages(profile)) {
+      const pageUrl = new URL(`${page}index.html`, root);
+      await writeFile(pageUrl, stampHtml(await readFile(pageUrl, "utf8"), version));
+    }
     for (const f of jsFiles) {
       const url = new URL(`assets/js/${f}`, root);
       await writeFile(url, stampImports(await readFile(url, "utf8"), version));
@@ -305,7 +306,7 @@ async function main() {
 
   if (profile.site_url) {
     const base = profile.site_url.replace(/\/?$/, "/");
-    await writeFile(new URL("sitemap.xml", root), sitemap(base));
+    await writeFile(new URL("sitemap.xml", root), sitemap(base, new Date(), demoPages(profile)));
     await writeFile(new URL("robots.txt", root), `User-agent: *\nAllow: /\n\nSitemap: ${base}sitemap.xml\n`);
   }
   console.log("Prerendered index.html, sitemap.xml, and robots.txt.");
