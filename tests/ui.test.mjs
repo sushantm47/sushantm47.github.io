@@ -5,7 +5,7 @@ import { ART_KINDS, artSvg } from "../assets/js/art.js";
 import { employerNames, employers, headlineParts } from "../assets/js/knowledge.js";
 import { countFrame, easeOut } from "../assets/js/ui.js";
 
-const profile = JSON.parse(await readFile(new URL("../data/profile.json", import.meta.url), "utf8"));
+const profile = JSON.parse(await readFile(new URL("../data/site.json", import.meta.url), "utf8"));
 
 test("count-up frames keep the text's format and end on the exact value", () => {
   assert.equal(countFrame("200–300 GB", 0), "0–0 GB");

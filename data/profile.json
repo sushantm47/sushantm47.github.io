@@ -1,25 +1,31 @@
 {
-  "name": "Sushant Mudalgi",
   "site_url": "https://sushantm47.github.io/",
-  "seo_title": "Sushant Mudalgi | Software Engineer, Data and AI | Boston",
-  "seo_description": "Sushant Mudalgi, software engineer in Boston and Northeastern MS CS student. 4 years at Takeda, EY, and Deloitte building data pipelines, APIs, and AI agents.",
   "role": "Software engineer",
   "headline": "I build dependable software, from data pipelines to APIs to AI agents.",
-  "intro": "MS in Computer Science student at Northeastern with four years of industry experience. I've shipped production pipelines behind regulatory reporting, warehouses and dashboards for business teams, web front ends, and an AI incident-response agent that cites its evidence.",
-  "previously": [
-    {
+  "headline_accent": "dependable",
+  "location": "Boston, MA",
+  "availability": "Open to co-op and full-time roles",
+  "status": "Open to software engineering, data engineering, and AI engineering roles, including co-op and full-time positions. I graduate in {graduation}.",
+  "seo_title": "Sushant Mudalgi | Software Engineer, Data and AI | Boston",
+  "seo_description": "Sushant Mudalgi, software engineer in Boston and Northeastern MS CS student. 4 years at Takeda, EY, and Deloitte building data pipelines, APIs, and AI agents.",
+  "github": {
+    "user": "sushantm47",
+    "topic": "portfolio"
+  },
+  "employers": {
+    "Takeda": {
       "name": "Takeda",
       "url": "https://www.takeda.com"
     },
-    {
+    "EY GDS": {
       "name": "EY",
       "url": "https://www.ey.com"
     },
-    {
+    "Deloitte USI": {
       "name": "Deloitte",
       "url": "https://www.deloitte.com"
     }
-  ],
+  },
   "stats": [
     {
       "value": "4 years",
@@ -27,23 +33,60 @@
     },
     {
       "value": "15+",
-      "label": "production pipelines maintained at Takeda"
+      "label": "production pipelines maintained at Takeda",
+      "from": {
+        "company": "Takeda",
+        "pattern": "(\\d+\\+?) production",
+        "format": "{1}"
+      }
     },
     {
       "value": "200+ GB",
-      "label": "processed by pipelines I built at EY"
+      "label": "processed daily by pipelines I built at EY",
+      "from": {
+        "company": "EY GDS",
+        "pattern": "(\\d+) to \\d+ GB",
+        "format": "{1}+ GB"
+      }
     },
     {
       "value": "25%",
-      "label": "workflow cost cut by an orchestration migration"
+      "label": "workflow cost cut by an orchestration migration",
+      "from": {
+        "company": "EY GDS",
+        "pattern": "(\\d+)(?: percent|%)",
+        "format": "{1}%"
+      }
     }
   ],
-  "location": "Boston, MA",
-  "status": "Open to software engineering, data engineering, and AI engineering roles, including co-op and full-time positions. I graduate in May 2027.",
+  "projects": {
+    "rootcite": {
+      "art": "flow",
+      "color": "#F5A524",
+      "previous_name": "OpsPilot",
+      "demo": {
+        "page": "rootcite/",
+        "api": "https://rootcite-g0bx.onrender.com"
+      }
+    },
+    "DealRadar": {
+      "art": "chart",
+      "color": "#3DD68C"
+    }
+  },
+  "additional_experience": [
+    {
+      "company": "Kalpas Innovations",
+      "title": "Software Engineering Intern, Web Development",
+      "location": "Hubli, India",
+      "start": "Mar 2021",
+      "end": "Jul 2021",
+      "bullets": [
+        "Built the React.js front end of a digital platform with real-time interactions for 5,000+ monthly active users, backed by a MongoDB document store."
+      ]
+    }
+  ],
   "links": {
-    "github": "sushantm47",
-    "linkedin": "https://www.linkedin.com/in/sushant-mudalgi",
-    "email": "mudalgi.s@northeastern.edu",
     "resume": "assets/resume.pdf"
   },
   "chat": {
@@ -54,338 +97,13 @@
       "What roles is {first} looking for, and when can {first} start?"
     ]
   },
-  "projects": [
-    {
-      "name": "RootCite",
-      "repo": "sushantm47/rootcite",
-      "summary": "Evidence-cited root-cause analysis for production alerts, previously named OpsPilot. Given an alert, an agent searches runbooks and past postmortems, checks deploys, metrics, and logs through tool calls, and returns a diagnosis that cites its evidence.",
-      "outcome": "Hybrid search (BM25 + dense vectors, fused with RRF) reached 1.000 hit@5 and 1.000 MRR on a golden dataset, versus 0.909 MRR for either method alone, enforced by a CI gate. A deterministic verifier drops made-up citations, logs are screened for prompt injection, and actions that change production need human approval.",
-      "stack": [
-        "Python",
-        "FastAPI",
-        "Claude",
-        "PostgreSQL + pgvector",
-        "MCP",
-        "AWS CDK"
-      ],
-      "docs": [
-        "docs/DESIGN.md"
-      ],
-      "featured": true,
-      "kind": "Solo project, previously named OpsPilot",
-      "case_study": {
-        "problem": "When a production alarm fires, on-call engineers often spend the first 15 to 30 minutes just connecting it to a recent deploy, a moving metric, and the right runbook. The knowledge exists, but it's scattered across docs, dashboards, and logs.",
-        "approach": "An agent that works like a careful on-call engineer: it retrieves relevant runbooks and past postmortems, investigates live signals with read-only tools, writes a structured diagnosis, and has that diagnosis checked by code before anyone sees it.",
-        "diagram": [
-          {
-            "step": "Retrieve",
-            "detail": "Runbooks and postmortems, hybrid search"
-          },
-          {
-            "step": "Investigate",
-            "detail": "Deploys, metrics, logs via tool calls"
-          },
-          {
-            "step": "Synthesize",
-            "detail": "Forced structured output"
-          },
-          {
-            "step": "Verify",
-            "detail": "Citations and confidence checked in code"
-          }
-        ],
-        "decisions": [
-          {
-            "title": "Hybrid search instead of embeddings alone",
-            "detail": "Incident text is full of exact identifiers like v2.14.0 and max.poll.interval.ms that embeddings blur. BM25 keyword search catches those, dense search catches paraphrases, and Reciprocal Rank Fusion combines them by rank with no score tuning."
-          },
-          {
-            "title": "Code checks the model's citations",
-            "detail": "Everything the agent sees gets an evidence ID. A deterministic verifier drops citations that don't exist, caps confidence when an answer isn't backed by live telemetry, and escalates to a human when unsure."
-          },
-          {
-            "title": "Logs are treated as untrusted input",
-            "detail": "Log lines can contain text written by attackers. RootCite flags prompt-injection attempts, redacts secrets and card numbers before the model sees them, and never runs an action that changes production without human approval."
-          },
-          {
-            "title": "A state machine instead of an agent framework",
-            "detail": "Explicit steps with hard budgets on steps, tool calls, and tokens make every path unit-testable and put an upper bound on cost and latency."
-          }
-        ],
-        "result": "1.000 hit@5 and 1.000 MRR on a golden dataset with hybrid search, versus 0.909 MRR for either method alone, enforced as a CI quality gate. 65+ automated tests cover the agent, guardrails, and retrieval, and the AWS infrastructure is defined as code with CDK."
-      },
-      "color": "#F5A524",
-      "art": "flow",
-      "tagline": "Root-cause analysis for production alerts, with every claim cited.",
-      "previous_name": "OpsPilot",
-      "demo": {
-        "page": "rootcite/",
-        "api": "https://rootcite-g0bx.onrender.com"
-      }
-    },
-    {
-      "name": "DealRadar",
-      "repo": "sushantm47/DealRadar",
-      "summary": "A full-stack price tracker for Amazon products: paste a product link, and it scrapes the price, charts its history, and flags a deal when the price drops below your target.",
-      "outcome": "Flask and MySQL backend where database triggers and stored procedures detect price drops, a scraper that handles deals, price ranges, and hidden prices, Chart.js price-history charts, and deal news pulled from RSS feeds.",
-      "stack": [
-        "Python",
-        "Flask",
-        "MySQL",
-        "BeautifulSoup",
-        "Pandas",
-        "Chart.js"
-      ],
-      "featured": true,
-      "kind": "Solo project",
-      "case_study": {
-        "problem": "Online prices change constantly, and good deals disappear before anyone notices. Checking products by hand doesn't scale past a few items.",
-        "approach": "Paste an Amazon product link. A scraper collects the price, the database records every change, and a dashboard charts price history and flags a deal when the price drops below your target.",
-        "diagram": [
-          {
-            "step": "Scrape",
-            "detail": "CloudScraper and BeautifulSoup"
-          },
-          {
-            "step": "Store",
-            "detail": "Price history in MySQL"
-          },
-          {
-            "step": "Detect",
-            "detail": "Triggers and stored procedures"
-          },
-          {
-            "step": "Show",
-            "detail": "Flask dashboard with Chart.js"
-          }
-        ],
-        "decisions": [
-          {
-            "title": "Deal detection lives in the database",
-            "detail": "MySQL triggers and stored procedures compare each new price with the user's target, so the alert logic runs exactly where the data changes."
-          },
-          {
-            "title": "A scraper built for messy product pages",
-            "detail": "It handles deal prices, price ranges, and hidden prices instead of assuming every page shows one clean number."
-          },
-          {
-            "title": "Context beyond the price",
-            "detail": "Deal news from RSS feeds sits next to the price-history charts, so users see why a price might be moving."
-          }
-        ],
-        "result": "A working full-stack app: Flask backend, a MySQL schema with triggers and stored procedures, a resilient scraper, and an interactive price-history dashboard."
-      },
-      "color": "#3DD68C",
-      "art": "chart",
-      "tagline": "A price tracker that charts Amazon price history and flags deals."
-    },
-    {
-      "name": "DNS simulation",
-      "repo": "sushantm47/DNS-simulation",
-      "summary": "A local DNS simulation built with socket programming in Python 3.",
-      "outcome": "",
-      "stack": [
-        "Python",
-        "Sockets",
-        "Networking"
-      ],
-      "featured": false,
-      "color": "#2DD4BF",
-      "art": "network",
-      "tagline": "A local DNS resolver simulation built with Python sockets."
-    },
-    {
-      "name": "COVID-19 tracker",
-      "repo": "sushantm47/c19-tracker",
-      "summary": "A React app that fetches real-time COVID-19 confirmed, recovered, and death counts, globally and by country.",
-      "outcome": "",
-      "stack": [
-        "JavaScript",
-        "React",
-        "REST APIs"
-      ],
-      "featured": false,
-      "color": "#FB7185",
-      "art": "globe",
-      "tagline": "A React dashboard of live COVID-19 counts, globally and by country."
-    }
-  ],
-  "experience": [
-    {
-      "role": "Data Engineer L4",
-      "org": "Takeda",
-      "location": "Bengaluru, India",
-      "start": "May 2025",
-      "end": "Aug 2025",
-      "points": [
-        "Joined Takeda directly after supporting its data engineering team through EY.",
-        "Developed and maintained 15+ production PySpark pipelines on Databricks across North America and Europe, powering analytics and regulatory reporting under strict data-compliance requirements.",
-        "Built secure data ingestion with Databricks Unity Catalog and AWS (S3, DMS, Step Functions, Lambda), including scheduled snapshot delivery from Databricks Delta Marketplace so downstream teams always had fresh data."
-      ],
-      "summary": "Maintained 15+ production PySpark pipelines on Databricks behind regulatory reporting across North America and Europe.",
-      "tags": [
-        "PySpark",
-        "Databricks",
-        "Unity Catalog",
-        "AWS"
-      ]
-    },
-    {
-      "role": "Data Engineer",
-      "org": "EY GDS",
-      "location": "Bengaluru, India",
-      "start": "Nov 2024",
-      "end": "Apr 2025",
-      "points": [
-        "Implemented 15 real-time and batch PySpark pipelines processing 200 to 300 GB from SQL Server, SFTP, SharePoint, Heroku, and third-party vendors, in modular, object-oriented Python.",
-        "Designed 30+ Delta Lake tables for fast queries and pharmaceutical reporting, with ingestion automated through AWS DMS, EventBridge, Step Functions, and S3.",
-        "Migrated orchestration from AWS Step Functions to Tidal, cutting workflow costs by 25% and scheduling 10+ Databricks workflows with clearer job dependencies."
-      ],
-      "summary": "Built 15 real-time and batch pipelines processing 200 to 300 GB, and cut workflow costs 25% by migrating orchestration.",
-      "tags": [
-        "PySpark",
-        "Delta Lake",
-        "AWS",
-        "Tidal"
-      ]
-    },
-    {
-      "role": "Software Engineering Analyst",
-      "org": "Deloitte USI",
-      "location": "Bengaluru, India",
-      "start": "Sep 2021",
-      "end": "Nov 2024",
-      "points": [
-        "Designed fact and dimension tables in Amazon Redshift and connected the warehouse to Tableau, delivering data models and dashboards for enterprise reporting.",
-        "Built ETL jobs in Talend and AWS Glue with reusable, object-oriented Python transformations, and led the migration of Talend jobs to AWS Glue.",
-        "Applied machine learning (K-Means, Mean Shift, linear regression, XGBoost) in Python to surface business insights from transactional data."
-      ],
-      "summary": "Designed Redshift data models and Tableau dashboards, and led the migration of Talend ETL jobs to AWS Glue.",
-      "tags": [
-        "Redshift",
-        "AWS Glue",
-        "Talend",
-        "Tableau"
-      ]
-    },
-    {
-      "role": "Software Engineering Intern, Web Development",
-      "org": "Kalpas Innovations",
-      "location": "Hubli, India",
-      "start": "Mar 2021",
-      "end": "Jul 2021",
-      "points": [
-        "Built the React.js front end of a digital platform with real-time interactions for 5,000+ monthly active users, backed by a MongoDB document store."
-      ],
-      "summary": "Built the React.js front end of a platform with 5,000+ monthly active users.",
-      "tags": [
-        "React.js",
-        "MongoDB"
-      ]
-    }
-  ],
-  "education": [
-    {
-      "degree": "MS in Computer Science",
-      "school": "Northeastern University, Khoury College",
-      "start": "Aug 2025",
-      "end": "May 2027",
-      "notes": "Coursework: Algorithms, Advanced Database Management Systems, Foundations of AI, Program Design Paradigms."
-    },
-    {
-      "degree": "BE in Computer Science",
-      "school": "KLE Technological University, Hubli",
-      "start": "Aug 2017",
-      "end": "May 2021",
-      "notes": "GPA 3.91 / 4.00. Coursework: Distributed Cloud Computing, Computer Networks, Database Management Systems, Machine Learning."
-    }
-  ],
-  "skills": [
-    {
-      "group": "Languages",
-      "items": [
-        "Python",
-        "SQL",
-        "Java",
-        "JavaScript",
-        "PySpark"
-      ],
-      "used_in": [
-        "Takeda",
-        "EY GDS",
-        "RootCite"
-      ]
-    },
-    {
-      "group": "Backend and web",
-      "items": [
-        "FastAPI",
-        "REST APIs",
-        "Flask",
-        "React.js",
-        "PostgreSQL",
-        "MySQL",
-        "MongoDB",
-        "Docker",
-        "Git and GitHub",
-        "CI/CD (Jenkins, GitHub Actions)"
-      ],
-      "used_in": [
-        "RootCite",
-        "DealRadar",
-        "Kalpas Innovations"
-      ]
-    },
-    {
-      "group": "Data and cloud",
-      "items": [
-        "Databricks (Delta Lake, Unity Catalog)",
-        "Spark",
-        "AWS (S3, Glue, Redshift, Lambda, DMS, EventBridge, Step Functions)",
-        "Snowflake",
-        "Airflow",
-        "Tidal",
-        "Talend",
-        "Tableau"
-      ],
-      "used_in": [
-        "Takeda",
-        "EY GDS",
-        "Deloitte USI"
-      ]
-    },
-    {
-      "group": "AI and ML",
-      "items": [
-        "RAG and hybrid search",
-        "LLM agents, tool use, and MCP",
-        "Evals and guardrails",
-        "scikit-learn",
-        "XGBoost",
-        "Pandas and NumPy"
-      ],
-      "used_in": [
-        "RootCite",
-        "Deloitte USI"
-      ]
-    }
-  ],
+  "analytics": {
+    "cloudflare_token": ""
+  },
   "faq": [
     {
-      "q": "What has {first} built in production?",
-      "a": "{first} has built production data pipelines for regulated pharmaceutical reporting at Takeda and EY, and data warehouses at Deloitte. At Takeda (May 2025 to Aug 2025), {first} maintained 15+ production PySpark pipelines on Databricks across North America and Europe, with secure ingestion through Unity Catalog and AWS. At EY GDS (Nov 2024 to Apr 2025), {first} built 15 real-time and batch pipelines processing 200 to 300 GB, designed 30+ Delta Lake tables, and cut workflow costs by 25% by migrating orchestration from AWS Step Functions to Tidal. At Deloitte USI (Sep 2021 to Nov 2024), {first} designed Amazon Redshift data models with Tableau dashboards and led the migration of Talend ETL jobs to AWS Glue. At Kalpas Innovations (2021), {first} built a React.js front end for a platform with 5,000+ monthly active users. RootCite and DealRadar are personal projects, not production systems."
-    },
-    {
-      "q": "What is {first}'s strongest project?",
-      "a": "RootCite (previously named OpsPilot), a personal project: an agentic RAG copilot for on-call incident response. Given an alert, it searches runbooks and past postmortems, checks deploys, metrics, and logs through tool calls, and returns a diagnosis that cites its evidence. Hybrid search (BM25 plus dense vectors, fused with Reciprocal Rank Fusion) reached 1.000 hit@5 and 1.000 MRR on a golden dataset, versus 0.909 MRR for either method alone, enforced as a CI quality gate. It also detects prompt injection in logs, redacts secrets and PII, and requires human approval for actions that change production."
-    },
-    {
-      "q": "Which cloud and data tools has {first} used at work?",
-      "a": "At Takeda and EY: PySpark, Databricks (Delta Lake, Unity Catalog, Delta Marketplace), and AWS (S3, DMS, Step Functions, Lambda, EventBridge), with Tidal for orchestration. At Deloitte: Amazon Redshift, AWS Glue, Talend, and Tableau."
-    },
-    {
       "q": "When can {first} start?",
-      "a": "{first} graduates from Northeastern in May 2027 and is open to co-op roles before then and full-time roles after."
+      "a": "{first} graduates from Northeastern in {graduation} and is open to co-op roles before then and full-time roles after."
     },
     {
       "q": "What kinds of roles is {first} looking for?",
@@ -395,12 +113,5 @@
       "q": "Where is {first} based?",
       "a": "{first} is based in Boston, Massachusetts."
     }
-  ],
-  "greeting": "Hey, I'm {first}",
-  "headline_accent": "dependable",
-  "availability": "Open to co-op and full-time roles",
-  "tagline": "Software engineer and MS in Computer Science student at Northeastern, with four years of industry experience across data platforms, backend services, and applied AI.",
-  "analytics": {
-    "cloudflare_token": ""
-  }
+  ]
 }

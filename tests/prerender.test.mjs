@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import { test } from "node:test";
 import { analyticsTag, description, eduHtml, escapeHtml, fillStatic, headTags, rolesHtml, statsHtml, tilesHtml, heroHtml, replaceBlock, sitemap, stampHtml, stampImports } from "../scripts/prerender.mjs";
 
-const profile = JSON.parse(await readFile(new URL("../data/profile.json", import.meta.url), "utf8"));
+const profile = JSON.parse(await readFile(new URL("../data/site.json", import.meta.url), "utf8"));
 
 test("head tags carry a search-friendly title, description, canonical URL, and preview image", () => {
   const head = headTags(profile);
@@ -23,7 +23,9 @@ test("structured data describes a profile page, the person, and each project", (
   assert.equal(ld["@graph"][0].mainEntity["@id"], person["@id"]);
   assert.ok(person.sameAs.includes("https://github.com/sushantm47"));
   assert.ok(person.alumniOf.some((o) => o.name === "Takeda"));
-  assert.ok(person.alumniOf.some((o) => o.name === "Northeastern University"));
+  for (const school of profile.education.map((e) => e.school.split(",")[0])) {
+    assert.ok(person.alumniOf.some((o) => o.name === school), school);
+  }
   const code = ld["@graph"].filter((n) => n["@type"] === "SoftwareSourceCode");
   assert.equal(code.length, profile.projects.length);
   assert.ok(code.every((c) => c.codeRepository.startsWith("https://github.com/")));
@@ -96,8 +98,15 @@ test("the page's Content Security Policy allows the analytics beacon and nothing
 
 test("the whole page is readable without JavaScript", async () => {
   const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
-  for (const text of ["RootCite", '"alternateName":"OpsPilot"', "DealRadar", "Recent activity", "Data Engineer L4", "at Takeda", "at EY GDS",
-    "Northeastern University", "15+", "Let's build something dependable."]) {
+  const expected = [
+    "Recent activity", "Let's build something dependable.",
+    ...profile.projects.map((p) => p.name),
+    ...profile.projects.filter((p) => p.previous_name).map((p) => `"alternateName":"${p.previous_name}"`),
+    ...profile.experience.flatMap((e) => [escapeHtml(e.role), `at ${escapeHtml(e.org)}`]),
+    ...profile.education.map((e) => escapeHtml(e.school)),
+    ...profile.stats.map((s) => escapeHtml(s.value)),
+  ];
+  for (const text of expected) {
     assert.ok(html.includes(text), `missing from static HTML: ${text}`);
   }
   assert.ok(!/data-href="(github|linkedin|resume|email)" href="#"/.test(html), "links still point to #");

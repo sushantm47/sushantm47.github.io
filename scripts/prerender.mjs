@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Writes profile.json content straight into index.html, plus robots.txt and sitemap.xml,
+// Writes the site model (data/site.json) straight into index.html, plus robots.txt and sitemap.xml,
 // so search engines and link previews see real text without running JavaScript.
 // Usage: node scripts/prerender.mjs
 
@@ -179,17 +179,27 @@ export function tilesHtml(p) {
     .filter((x) => x.featured !== false)
     .map((pr, i) => {
       const kicker = `Case study ${String(i + 1).padStart(2, "0")}`;
-      const opener = pr.case_study
+      const hasCase = Boolean(pr.highlights?.length || pr.readme);
+      const opener = hasCase
         ? `<button class="tile" id="${projectAnchor(pr.name)}" type="button" data-case="${escapeHtml(pr.name)}" data-repo="${escapeHtml(pr.repo)}" aria-label="${escapeHtml(pr.name)}: read the case study">`
         : `<a class="tile" id="${projectAnchor(pr.name)}" href="${escapeHtml(repoUrl(pr))}" data-repo="${escapeHtml(pr.repo)}" target="_blank" rel="noopener">`;
-      const closer = pr.case_study ? "</button>" : "</a>";
-      return `${opener}<div class="tile-art">${artSvg(pr.art)}</div><span class="tile-body">` +
+      const closer = hasCase ? "</button>" : "</a>";
+      const badge = pr.demo?.page
+        ? `<a class="demo-badge" href="${escapeHtml(pr.demo.page)}"><span class="pulse" aria-hidden="true"></span>Live demo</a>`
+        : "";
+      return `<div class="tile-wrap">${opener}<div class="tile-art">${artSvg(pr.art)}</div><span class="tile-body">` +
         `<span class="tile-kicker">${kicker}</span><span class="tile-title">${escapeHtml(pr.name)}</span>` +
         `<span class="tile-summary">${escapeHtml(fill(pr.tagline || pr.summary, p))}</span>` +
         `<span class="tile-foot"><span class="tile-tags">${escapeHtml((pr.stack || []).slice(0, 3).join(", "))}</span>` +
-        `<span class="tile-cta">${pr.case_study ? "Read case study" : "View code"}</span></span></span>${closer}`;
+        `<span class="tile-cta">${hasCase ? "Read case study" : "View code"}</span></span></span>${closer}${badge}</div>`;
     })
     .join("\n");
+}
+
+export function toolboxHtml(p) {
+  return skillGroups(p)
+    .map((g) => `<div><dt>${escapeHtml(g.group)}</dt><dd>${tagsHtml(g.items)}</dd></div>`)
+    .join("");
 }
 
 export function statsHtml(p) {
@@ -272,12 +282,12 @@ export async function assetVersion(root, files) {
 }
 
 export function demoPages(p) {
-  return (p.projects || []).map((pr) => pr.demo?.page).filter(Boolean);
+  return (p.projects || []).map((pr) => pr.demo?.page).filter((page) => page && !/^https?:/.test(page));
 }
 
 async function main() {
   const root = new URL("../", import.meta.url);
-  const profile = JSON.parse(await readFile(new URL("data/profile.json", root), "utf8"));
+  const profile = JSON.parse(await readFile(new URL("data/site.json", root), "utf8"));
   let html = await readFile(new URL("index.html", root), "utf8");
   html = replaceBlock(html, "head", headTags(profile));
   html = replaceBlock(html, "hero", heroHtml(profile));
@@ -285,6 +295,7 @@ async function main() {
   html = replaceBlock(html, "stats", statsHtml(profile));
   html = replaceBlock(html, "roles", rolesHtml(profile));
   html = replaceBlock(html, "edu", eduHtml(profile));
+  html = replaceBlock(html, "toolbox", toolboxHtml(profile));
   html = fillStatic(html, profile);
 
   if (process.argv.includes("--bust")) {

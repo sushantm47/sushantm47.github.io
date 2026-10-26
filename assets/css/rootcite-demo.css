@@ -1,6 +1,6 @@
 :root {
   --bg: #0c0c0e; --surface: #151517; --surface-2: #1d1d21; --ink: #ededf0; --muted: #a1a1aa;
-  --rule: #2a2a30; --mark: #d97f8f; --fill: #7b2235; --fill-hover: #922a41; --on-fill: #f7eef0; --ok: #3dd68c; --warn: #f5a524; --bad: #fb7185;
+  --rule: #2a2a30; --mark: #ef8a98; --fill: #9e1b32; --fill-hover: #b32139; --on-fill: #ffffff; --ok: #3dd68c; --warn: #f5a524; --bad: #fb7185;
   --sans: "Geist", system-ui, -apple-system, "Segoe UI", sans-serif; --mono: "Geist Mono", ui-monospace, Menlo, monospace;
   color-scheme: dark;
 }

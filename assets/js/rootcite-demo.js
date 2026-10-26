@@ -127,7 +127,7 @@ function renderResult(d) {
 
 async function main() {
   const [profile, example] = await Promise.all([
-    getJson("../data/profile.json").then((r) => r.body),
+    getJson("../data/site.json").then((r) => r.body),
     getJson("../data/rootcite-example.json").then((r) => r.body),
   ]);
   const project = (profile?.projects || []).find((p) => p.demo);

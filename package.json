@@ -4,11 +4,12 @@
   "type": "module",
   "description": "Portfolio site with a free, repo-grounded AI assistant",
   "scripts": {
-    "test": "node --test",
-    "build:knowledge": "node scripts/build-knowledge.mjs",
-    "build:knowledge:offline": "node scripts/build-knowledge.mjs --offline",
-    "prerender": "node scripts/prerender.mjs",
+    "test": "node --test && python3 -m unittest discover -s tests -p \"test_*.py\"",
+    "build": "python3 scripts/parse_resume.py && node scripts/build-site.mjs && node scripts/build-knowledge.mjs && node scripts/prerender.mjs",
+    "build:offline": "python3 scripts/parse_resume.py && node scripts/build-site.mjs --offline && node scripts/build-knowledge.mjs --offline && node scripts/prerender.mjs",
     "serve": "python3 -m http.server 8000"
   },
-  "engines": { "node": ">=20" }
+  "engines": {
+    "node": ">=20"
+  }
 }

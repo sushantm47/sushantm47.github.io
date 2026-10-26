@@ -1,0 +1,339 @@
+{
+  "name": "Sushant Mudalgi",
+  "site_url": "https://sushantm47.github.io/",
+  "role": "Software engineer",
+  "headline": "I build dependable software, from data pipelines to APIs to AI agents.",
+  "headline_accent": "dependable",
+  "tagline": "Software engineer with four years at Takeda, EY, and Deloitte building data platforms, backend services, and applied AI, from PySpark pipelines processing 200 to 300 GB daily to AI agents with evaluations and guardrails.",
+  "intro": "Software engineer with four years at Takeda, EY, and Deloitte building data platforms, backend services, and applied AI, from PySpark pipelines processing 200 to 300 GB daily to AI agents with evaluations and guardrails.",
+  "location": "Boston, MA",
+  "availability": "Open to co-op and full-time roles",
+  "status": "Open to software engineering, data engineering, and AI engineering roles, including co-op and full-time positions. I graduate in May 2027.",
+  "seo_title": "Sushant Mudalgi | Software Engineer, Data and AI | Boston",
+  "seo_description": "Sushant Mudalgi, software engineer in Boston and Northeastern MS CS student. 4 years at Takeda, EY, and Deloitte building data pipelines, APIs, and AI agents.",
+  "previously": [
+    {
+      "name": "Takeda",
+      "url": "https://www.takeda.com"
+    },
+    {
+      "name": "EY",
+      "url": "https://www.ey.com"
+    },
+    {
+      "name": "Deloitte",
+      "url": "https://www.deloitte.com"
+    }
+  ],
+  "stats": [
+    {
+      "value": "4 years",
+      "label": "of industry experience"
+    },
+    {
+      "value": "15+",
+      "label": "production pipelines maintained at Takeda"
+    },
+    {
+      "value": "200+ GB",
+      "label": "processed daily by pipelines I built at EY"
+    },
+    {
+      "value": "25%",
+      "label": "workflow cost cut by an orchestration migration"
+    }
+  ],
+  "links": {
+    "github": "sushantm47",
+    "linkedin": "https://linkedin.com/in/sushant-mudalgi",
+    "email": "mudalgi.s@northeastern.edu",
+    "resume": "assets/resume.pdf"
+  },
+  "chat": {
+    "endpoint": "https://portfolio-chat.sushantmudalgi99.workers.dev",
+    "suggestions": [
+      "What has {first} built in production?",
+      "What's {first}'s strongest project?",
+      "What roles is {first} looking for, and when can {first} start?"
+    ]
+  },
+  "analytics": {
+    "cloudflare_token": ""
+  },
+  "projects": [
+    {
+      "name": "RootCite",
+      "repo": "sushantm47/rootcite",
+      "tagline": "AI Copilot for Production Alerts",
+      "summary": "AI Copilot for Production Alerts",
+      "stack": [
+        "Python",
+        "FastAPI",
+        "Claude",
+        "pgvector",
+        "AWS CDK"
+      ],
+      "highlights": [
+        "Built an AI copilot that diagnoses production alerts through a retrieve, investigate, synthesize, and verify loop on Claude, with tool calling, step and token budgets, and a citation for every claim.",
+        "Reached 1.000 hit@5 and MRR with hybrid BM25 and pgvector retrieval fused by reciprocal rank fusion, versus 0.909 for either alone, with an eval suite gating every merge in GitHub Actions.",
+        "Added prompt injection and PII guardrails and an MCP server, with Docker and AWS CDK infrastructure defined for ECS Fargate, RDS Postgres, and Secrets Manager."
+      ],
+      "readme": "",
+      "release": null,
+      "language": "",
+      "stars": 0,
+      "homepage": "",
+      "demo": {
+        "page": "rootcite/",
+        "api": "https://rootcite-g0bx.onrender.com"
+      },
+      "previous_name": "OpsPilot",
+      "kind": "Solo project",
+      "color": "#F5A524",
+      "art": "flow",
+      "featured": true
+    },
+    {
+      "name": "DealRadar",
+      "repo": "sushantm47/DealRadar",
+      "tagline": "Amazon Price Tracker",
+      "summary": "Amazon Price Tracker",
+      "stack": [
+        "Python",
+        "Flask",
+        "MySQL",
+        "Chart.js"
+      ],
+      "highlights": [
+        "Built a full stack price tracker with a CloudScraper and BeautifulSoup scraper that handles deals, price ranges, and hidden prices, plus Chart.js price history charts in a Bootstrap dashboard.",
+        "Used MySQL triggers and stored procedures to flag price drops below user targets, and pulled deal news from RSS feeds."
+      ],
+      "readme": "",
+      "release": null,
+      "language": "",
+      "stars": 0,
+      "homepage": "",
+      "kind": "Solo project",
+      "color": "#3DD68C",
+      "art": "chart",
+      "featured": true
+    }
+  ],
+  "experience": [
+    {
+      "role": "Data Engineer L4",
+      "org": "Takeda",
+      "location": "Bangalore, India",
+      "start": "May 2025",
+      "end": "Aug 2025",
+      "summary": "Developed and maintained 15+ production PySpark pipelines on Databricks for PDT BioLife, powering analytics and regulatory reporting across North America and Europe under strict data compliance requirements.",
+      "points": [
+        "Developed and maintained 15+ production PySpark pipelines on Databricks for PDT BioLife, powering analytics and regulatory reporting across North America and Europe under strict data compliance requirements.",
+        "Built secure ingestion with Unity Catalog and AWS (S3, DMS, Step Functions, Lambda), including scheduled snapshot delivery from Databricks Delta Marketplace so downstream teams always had fresh data.",
+        "Built React dashboards on campaign data for marketing and leadership, tracked runs in MLflow, and validated transformations with pytest in CI, using Claude Code and Copilot with review before every merge."
+      ],
+      "tags": [
+        "PySpark",
+        "Databricks",
+        "AWS",
+        "React",
+        "MLflow",
+        "Claude"
+      ]
+    },
+    {
+      "role": "Data Engineer",
+      "org": "EY GDS",
+      "location": "Bangalore, India",
+      "start": "Nov 2024",
+      "end": "Apr 2025",
+      "summary": "Implemented 15 real time and batch PySpark pipelines processing 200 to 300 GB daily from SQL Server, SFTP, SharePoint, Heroku, and third party vendors, written in modular, object oriented Python.",
+      "points": [
+        "Implemented 15 real time and batch PySpark pipelines processing 200 to 300 GB daily from SQL Server, SFTP, SharePoint, Heroku, and third party vendors, written in modular, object oriented Python.",
+        "Designed 30+ Delta Lake tables in a dbt medallion architecture for pharmaceutical reporting, with entity resolution merging duplicate records and ingestion automated through DMS, EventBridge, and S3.",
+        "Migrated orchestration from Step Functions to Tidal, cutting workflow costs 25 percent across 10+ Databricks workflows, and replaced manual metadata tagging with OpenAI API and LangChain automation.",
+        "Built containerized applications in Go with Docker, packaging services so they deployed the same way across environments."
+      ],
+      "tags": [
+        "PySpark",
+        "SQL",
+        "Python",
+        "dbt",
+        "Databricks",
+        "OpenAI API"
+      ]
+    },
+    {
+      "role": "Software Engineering Analyst",
+      "org": "Deloitte USI",
+      "location": "Bangalore, India",
+      "start": "Sep 2021",
+      "end": "Nov 2024",
+      "summary": "Designed fact and dimension tables in Amazon Redshift connected to Tableau, delivering data models and dashboards for J&J LifeScan reporting on IQVIA, Symphony Health, and JD Edwards ERP data.",
+      "points": [
+        "Designed fact and dimension tables in Amazon Redshift connected to Tableau, delivering data models and dashboards for J&J LifeScan reporting on IQVIA, Symphony Health, and JD Edwards ERP data.",
+        "Built ETL jobs in Talend and AWS Glue with reusable Python transformations, and led the Talend to Glue migration.",
+        "Applied K-Means, Mean Shift, linear regression, and XGBoost in Python to surface insights and forecasts from transactional data, and built pgvector semantic search and OpenAI API proofs of concept.",
+        "Wrote production C++, Java, and C# .NET code using OOD, including Spring Boot and Flask REST APIs for US Mobile with React front ends, deployed on Red Hat OpenShift through Jenkins CI/CD."
+      ],
+      "tags": [
+        "Redshift",
+        "Tableau",
+        "Talend",
+        "AWS Glue",
+        "AWS",
+        "Python"
+      ]
+    },
+    {
+      "role": "Software Engineering Intern, Web Development",
+      "org": "Kalpas Innovations",
+      "location": "Hubli, India",
+      "start": "Mar 2021",
+      "end": "Jul 2021",
+      "summary": "Built the React.js front end of a digital platform with real-time interactions for 5,000+ monthly active users, backed by a MongoDB document store.",
+      "points": [
+        "Built the React.js front end of a digital platform with real-time interactions for 5,000+ monthly active users, backed by a MongoDB document store."
+      ],
+      "tags": [
+        "React",
+        "MongoDB"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "MS in Computer Science",
+      "school": "Northeastern University, Khoury College",
+      "start": "Aug 2025",
+      "end": "May 2027",
+      "notes": "Coursework: Algorithms, Programming Design Paradigm, Building Scalable Distributed Systems, Foundations of AI, MLOps."
+    },
+    {
+      "degree": "B.E. Computer Science",
+      "school": "KLE Technological University, Hubli",
+      "start": "Aug 2017",
+      "end": "May 2021",
+      "notes": "GPA 3.91 / 4.00. Coursework: Distributed Cloud Computing, Computer Networks, Database Management Systems, Machine Learning."
+    }
+  ],
+  "skills": [
+    {
+      "group": "Languages",
+      "items": [
+        "Python",
+        "Java",
+        "C++",
+        "C#",
+        "Go",
+        "TypeScript",
+        "JavaScript",
+        "SQL"
+      ],
+      "used_in": [
+        "Deloitte USI",
+        "EY GDS"
+      ]
+    },
+    {
+      "group": "Backend and Frontend",
+      "items": [
+        "Spring Boot",
+        "FastAPI",
+        "Flask",
+        "Django",
+        "Node.js",
+        "REST APIs",
+        "React",
+        "PostgreSQL",
+        "MySQL",
+        "MongoDB"
+      ],
+      "used_in": [
+        "Deloitte USI",
+        "Kalpas Innovations",
+        "Takeda"
+      ]
+    },
+    {
+      "group": "Data",
+      "items": [
+        "PySpark",
+        "Databricks (Delta Lake, Unity Catalog)",
+        "dbt",
+        "Airflow",
+        "Talend",
+        "AWS Glue",
+        "Redshift",
+        "Snowflake",
+        "Tableau"
+      ],
+      "used_in": [
+        "EY GDS",
+        "Deloitte USI",
+        "Takeda"
+      ]
+    },
+    {
+      "group": "Cloud and DevOps",
+      "items": [
+        "AWS (S3, Lambda, DMS, Step Functions, EventBridge, ECS Fargate, RDS, CDK)",
+        "Azure",
+        "GCP",
+        "Docker"
+      ],
+      "used_in": [
+        "Takeda",
+        "EY GDS",
+        "RootCite"
+      ]
+    },
+    {
+      "group": "AI and ML",
+      "items": [
+        "Claude",
+        "OpenAI API",
+        "LangChain",
+        "RAG",
+        "pgvector",
+        "MCP",
+        "Evals",
+        "PyTorch",
+        "scikit-learn",
+        "XGBoost",
+        "MLflow"
+      ],
+      "used_in": [
+        "Deloitte USI",
+        "RootCite",
+        "Takeda"
+      ]
+    }
+  ],
+  "faq": [
+    {
+      "q": "What has {first} built in production?",
+      "a": "At Takeda (May 2025 to Aug 2025), as Data Engineer L4: Developed and maintained 15+ production PySpark pipelines on Databricks for PDT BioLife, powering analytics and regulatory reporting across North America and Europe under strict data compliance requirements. Built secure ingestion with Unity Catalog and AWS (S3, DMS, Step Functions, Lambda), including scheduled snapshot delivery from Databricks Delta Marketplace so downstream teams always had fresh data. Built React dashboards on campaign data for marketing and leadership, tracked runs in MLflow, and validated transformations with pytest in CI, using Claude Code and Copilot with review before every merge. At EY GDS (Nov 2024 to Apr 2025), as Data Engineer: Implemented 15 real time and batch PySpark pipelines processing 200 to 300 GB daily from SQL Server, SFTP, SharePoint, Heroku, and third party vendors, written in modular, object oriented Python. Designed 30+ Delta Lake tables in a dbt medallion architecture for pharmaceutical reporting, with entity resolution merging duplicate records and ingestion automated through DMS, EventBridge, and S3. Migrated orchestration from Step Functions to Tidal, cutting workflow costs 25 percent across 10+ Databricks workflows, and replaced manual metadata tagging with OpenAI API and LangChain automation. Built containerized applications in Go with Docker, packaging services so they deployed the same way across environments. At Deloitte USI (Sep 2021 to Nov 2024), as Software Engineering Analyst: Designed fact and dimension tables in Amazon Redshift connected to Tableau, delivering data models and dashboards for J&J LifeScan reporting on IQVIA, Symphony Health, and JD Edwards ERP data. Built ETL jobs in Talend and AWS Glue with reusable Python transformations, and led the Talend to Glue migration. Applied K-Means, Mean Shift, linear regression, and XGBoost in Python to surface insights and forecasts from transactional data, and built pgvector semantic search and OpenAI API proofs of concept. Wrote production C++, Java, and C# .NET code using OOD, including Spring Boot and Flask REST APIs for US Mobile with React front ends, deployed on Red Hat OpenShift through Jenkins CI/CD. At Kalpas Innovations (Mar 2021 to Jul 2021), as Software Engineering Intern, Web Development: Built the React.js front end of a digital platform with real-time interactions for 5,000+ monthly active users, backed by a MongoDB document store. RootCite and DealRadar are personal projects, not production systems."
+    },
+    {
+      "q": "When can {first} start?",
+      "a": "{first} graduates from Northeastern in May 2027 and is open to co-op roles before then and full-time roles after."
+    },
+    {
+      "q": "What kinds of roles is {first} looking for?",
+      "a": "Software engineering, data engineering, and AI engineering roles. {first} has four years of production experience across data platforms, backend and web development, and applied AI."
+    },
+    {
+      "q": "Where is {first} based?",
+      "a": "{first} is based in Boston, Massachusetts."
+    }
+  ],
+  "sources": {
+    "resume": {
+      "file": "resume.pdf",
+      "sha256": "f5b81306c7109878"
+    },
+    "github_topic": "portfolio",
+    "built_at": null
+  }
+}

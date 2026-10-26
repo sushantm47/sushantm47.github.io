@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Builds data/knowledge.json from data/profile.json plus the READMEs and docs of your repos.
+// Builds data/knowledge.json from data/site.json plus the READMEs and docs of your repos.
 // This is retrieval-augmented generation (RAG): the chatbot looks things up here at question
 // time instead of being fine-tuned, so it updates on every deploy and costs nothing to "train".
 //
@@ -115,7 +115,7 @@ async function addAllRepos(profile, chunks, { fetchImpl, log }) {
       const hint = suggestRepo(project.repo, repos);
       log.warn(
         `  ! featured repo "${project.repo}" was not found among public repos` +
-          (hint ? `. Did you mean "${hint}"? Fix it in data/profile.json.` : ". Is it public?")
+          (hint ? `. Did you mean "${hint}"? Check the repository name.` : ". Is it public?")
       );
     }
   }
@@ -168,11 +168,11 @@ export async function buildKnowledge(profile, { offline = false, fetchImpl = fet
 
 async function main() {
   const offline = process.argv.includes("--offline");
-  const profile = JSON.parse(await readFile(new URL("../data/profile.json", import.meta.url), "utf8"));
+  const profile = JSON.parse(await readFile(new URL("../data/site.json", import.meta.url), "utf8"));
 
   const placeholders = findPlaceholders(profile);
   if (placeholders.length) {
-    console.warn(`Warning: ${placeholders.length} fields in data/profile.json still hold template text:`);
+    console.warn(`Warning: ${placeholders.length} fields in data/site.json still hold template text:`);
     for (const p of placeholders) console.warn(`  - ${p}`);
   }
 

@@ -3,9 +3,9 @@ import { readFile } from "node:fs/promises";
 import { test } from "node:test";
 import { anchorFor, joinList, profileToChunks, skillGroups } from "../assets/js/knowledge.js";
 import { splitNumbers } from "../assets/js/render.js";
-import { heroHtml } from "../scripts/prerender.mjs";
+import { escapeHtml, heroHtml } from "../scripts/prerender.mjs";
 
-const profile = JSON.parse(await readFile(new URL("../data/profile.json", import.meta.url), "utf8"));
+const profile = JSON.parse(await readFile(new URL("../data/site.json", import.meta.url), "utf8"));
 
 test("impact numbers are split out for highlighting", () => {
   const nums = (t) => splitNumbers(t).filter((p) => p.number).map((p) => p.text);
@@ -34,23 +34,54 @@ test("every skill 'used in' name links to a project or a job on the page", () =>
   assert.deepEqual(skillGroups({ skills: { A: ["x"] } }), [{ group: "A", items: ["x"], used_in: [] }]);
 });
 
-test("case studies are complete and searchable by the assistant", () => {
+test("case studies come from the resume and are searchable by the assistant", () => {
   const featured = profile.projects.filter((p) => p.featured !== false);
   assert.ok(featured.length >= 1);
-  for (const p of featured) {
-    for (const key of ["problem", "approach", "result"]) assert.ok(p.case_study?.[key], `${p.name}.${key}`);
-  }
-  const chunk = profileToChunks(profile).find((c) => c.title === "Case study: RootCite");
-  assert.match(chunk.text, /Decision: Hybrid search/);
-  assert.match(chunk.text, /Retrieve \(/);
+  for (const p of featured) assert.ok(p.highlights.length >= 1, `${p.name} has resume highlights`);
+  const chunk = profileToChunks(profile).find((c) => c.title === "Highlights: RootCite");
+  assert.match(chunk.text, /reciprocal rank fusion/);
+  assert.match(chunk.text, /previously named OpsPilot/);
 });
 
 test("the prerendered hero has availability, the highlighted word, and linked employers", () => {
   const html = heroHtml(profile);
-  assert.match(html, /Open to co-op and full-time roles, graduating May 2027/);
+  assert.ok(html.includes(`graduating ${profile.education[0].end}`), "availability names the graduation date");
   assert.match(html, /<p class="hero-name"><span data-name>Sushant Mudalgi<\/span><\/p>/, "name is visible above the headline");
   assert.match(html, /I build <span class="accent">dependable<\/span> software/);
   assert.match(html, /Previously at <a href="https:\/\/www.takeda.com"[^>]*>Takeda<\/a>, <a[^>]*>EY<\/a>, and <a[^>]*>Deloitte<\/a>/);
   assert.ok(!/<dl/.test(html), "stats live in Experience now, not the hero");
   assert.ok(!/style=/.test(html), "no inline styles: the CSP blocks them");
+});
+
+test("the RootCite tile carries a live demo badge, and only projects with a demo do", async () => {
+  const { tilesHtml } = await import("../scripts/prerender.mjs");
+  const html = tilesHtml(profile);
+  assert.equal((html.match(/class="demo-badge"/g) || []).length, profile.projects.filter((p) => p.demo && p.featured !== false).length);
+  assert.match(html, /<a class="demo-badge" href="rootcite\/">/);
+  assert.ok(!/<button[^>]*>(?:(?!<\/button>)[\s\S])*demo-badge/.test(html), "the badge is not nested inside the tile button");
+});
+
+test("the toolbox lists every skill group and is readable without JavaScript", async () => {
+  const { toolboxHtml } = await import("../scripts/prerender.mjs");
+  const html = toolboxHtml(profile);
+  for (const g of profile.skills) assert.ok(html.includes(`<dt>${g.group}</dt>`), g.group);
+  const page = await readFile(new URL("../index.html", import.meta.url), "utf8");
+  for (const skill of profile.skills.flatMap((g) => g.items)) {
+    assert.ok(page.includes(escapeHtml(skill)), `toolbox shows ${skill}`);
+  }
+  assert.match(page, /rel="apple-touch-icon" href="assets\/img\/apple-touch-icon.png"/);
+});
+
+test("the site's content matches the resume it was built from", async () => {
+  const resume = JSON.parse(await readFile(new URL("../data/resume.json", import.meta.url), "utf8"));
+  resume.experience.forEach((job, i) => {
+    const role = profile.experience[i];
+    assert.equal(role.org, job.company);
+    assert.equal(role.role, job.title);
+    assert.deepEqual(role.points, job.bullets, `${job.company} bullets are copied exactly`);
+  });
+  resume.education.forEach((school, i) => {
+    for (const course of school.coursework) assert.ok(profile.education[i].notes.includes(course), course);
+  });
+  assert.equal(profile.intro, resume.summary);
 });

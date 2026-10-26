@@ -1,4 +1,5 @@
 import { artSvg } from "./art.js";
+import { parseMarkdown, safeHref, withoutTitle } from "./markdown.js";
 import { initChat } from "./chat.js";
 import {
   employers,
@@ -8,6 +9,7 @@ import {
   headlineParts,
   projectAnchor,
   repoUrl,
+  skillGroups,
 } from "./knowledge.js";
 import { splitNumbers } from "./render.js";
 import { copyButtons, countUp, dockAsk, progressBar, reveal, scrollSpy, whenNear } from "./ui.js";
@@ -17,7 +19,7 @@ const PLACEHOLDER_USER = "your-github-username";
 async function main() {
   document.documentElement.classList.add("js");
   initTheme();
-  const profile = await (await fetch("data/profile.json", { cache: "no-cache" })).json();
+  const profile = await (await fetch("data/site.json", { cache: "no-cache" })).json();
   renderProfile(profile);
 
   const chat = await initChat(profile, document.getElementById("ask"));
@@ -111,6 +113,11 @@ function renderProfile(p) {
     roles.append(item);
   });
 
+  const toolbox = document.getElementById("toolbox");
+  toolbox.replaceChildren(...skillGroups(p).map((g) => el("div", {},
+    el("dt", { text: g.group }),
+    el("dd", {}, el("ul", { class: "tags tags-sm" }, ...g.items.map((t) => el("li", { text: t })))))));
+
   const edu = document.getElementById("edu-list");
   edu.replaceChildren();
   for (const ed of p.education || []) {
@@ -147,12 +154,12 @@ function renderStats(p) {
 function tile(project, caseNumber, f) {
   const art = el("div", { class: "tile-art" });
   art.innerHTML = artSvg(project.art); // static, trusted markup from art.js
-  const node = el(project.case_study ? "button" : "a", {
+  const hasCase = hasCaseStudy(project);
+  const node = el(hasCase ? "button" : "a", {
     class: "tile",
     id: projectAnchor(project.name),
     "data-repo": project.repo,
-    "data-reveal": "",
-    ...(project.case_study
+    ...(hasCase
       ? { type: "button", "data-case": project.name, "aria-label": `${project.name}: read the case study` }
       : { href: repoUrl(project), target: "_blank", rel: "noopener" }),
   },
@@ -163,9 +170,12 @@ function tile(project, caseNumber, f) {
       el("span", { class: "tile-summary", text: f(project.tagline || project.summary) }),
       el("span", { class: "tile-foot" },
         el("span", { class: "tile-tags", text: (project.stack || []).slice(0, 3).join(", ") }),
-        el("span", { class: "tile-cta", text: project.case_study ? "Read case study" : "View code" }))));
-  stagger(node, caseNumber - 1);
-  return node;
+        el("span", { class: "tile-cta", text: hasCase ? "Read case study" : "View code" }))));
+  const badge = project.demo && el("a", { class: "demo-badge", href: project.demo.page },
+    el("span", { class: "pulse", "aria-hidden": "true" }), "Live demo");
+  const wrap = el("div", { class: "tile-wrap", "data-reveal": "" }, node, badge);
+  stagger(wrap, caseNumber - 1);
+  return wrap;
 }
 
 // A demo hosted on a free plan sleeps when idle. A GET /health wakes it without using any
@@ -191,7 +201,7 @@ function initCaseDialog(profile, f) {
     const trigger = e.target.closest("[data-case]");
     if (!trigger) return;
     const project = (profile.projects || []).find((p) => p.name === trigger.dataset.case);
-    if (!project?.case_study) return;
+    if (!hasCaseStudy(project)) return;
     wakeDemos({ projects: [project] });
     opener = trigger;
     body.replaceChildren(caseStudy(project, f));
@@ -209,8 +219,66 @@ function initCaseDialog(profile, f) {
   });
 }
 
+export function hasCaseStudy(project) {
+  return Boolean(project?.highlights?.length || project?.readme);
+}
+
+// The README is fetched live, so edits on GitHub show up immediately; the copy from the last
+// build is the fallback (for example when GitHub's rate limit is reached).
+async function liveReadme(project) {
+  const key = `readme:${project.repo}`;
+  try {
+    const cached = sessionStorage.getItem(key);
+    if (cached) return cached;
+  } catch { /* storage unavailable */ }
+  try {
+    const res = await fetch(`https://api.github.com/repos/${project.repo}/readme`, {
+      headers: { accept: "application/vnd.github.raw+json" },
+    });
+    if (!res.ok) throw new Error(String(res.status));
+    const text = await res.text();
+    try { sessionStorage.setItem(key, text); } catch { /* storage full */ }
+    return text;
+  } catch {
+    return project.readme || "";
+  }
+}
+
+function inlineNodes(parts, repo) {
+  return parts.map((p) => {
+    if (p.type === "link") {
+      const href = safeHref(p.href, repo);
+      return href ? el("a", { href, target: "_blank", rel: "noopener", text: p.value }) : p.value;
+    }
+    if (p.type === "code") return el("code", { text: p.value });
+    if (p.type === "strong") return el("strong", { text: p.value });
+    if (p.type === "em") return el("em", { text: p.value });
+    return p.value;
+  });
+}
+
+function markdownNodes(markdown, repo) {
+  return withoutTitle(parseMarkdown(markdown)).map((b) => {
+    if (b.type === "heading") return el(`h${Math.min(6, b.level + 2)}`, {}, ...inlineNodes(b.inlines, repo));
+    if (b.type === "paragraph") return el("p", {}, ...inlineNodes(b.inlines, repo));
+    if (b.type === "quote") return el("blockquote", {}, ...inlineNodes(b.inlines, repo));
+    if (b.type === "list") return el(b.ordered ? "ol" : "ul", {}, ...b.items.map((i) => el("li", {}, ...inlineNodes(i, repo))));
+    if (b.type === "rule") return el("hr");
+    if (b.type === "code") {
+      return b.lang === "mermaid"
+        ? el("p", { class: "case-note", text: "A diagram is included in the README on GitHub." })
+        : el("pre", {}, el("code", { text: b.text }));
+    }
+    if (b.type === "table") {
+      return el("div", { class: "table-wrap" }, el("table", {},
+        el("thead", {}, el("tr", {}, ...b.head.map((c) => el("th", {}, ...inlineNodes(c, repo))))),
+        el("tbody", {}, ...b.rows.map((r) => el("tr", {}, ...r.map((c) => el("td", {}, ...inlineNodes(c, repo))))))));
+    }
+    return null;
+  }).filter(Boolean);
+}
+
 function caseStudy(project, f) {
-  const cs = project.case_study;
   const art = el("div", { class: "case-art" });
   art.innerHTML = artSvg(project.art);
   const ask = el("button", { type: "button", class: "text-link", text: "Ask about this" });
@@ -218,26 +286,29 @@ function caseStudy(project, f) {
     document.getElementById("case-dialog").close();
     document.dispatchEvent(new CustomEvent("portfolio:ask", { detail: `Tell me about ${project.name}: the problem, the approach, and the result.` }));
   });
+  const readme = el("div", { class: "readme", "aria-busy": "true" }, el("p", { class: "case-note", text: "Loading the README from GitHub…" }));
+  liveReadme(project).then((text) => {
+    readme.replaceChildren(...(text ? markdownNodes(text, project.repo) : [el("p", { class: "case-note", text: "This repository has no README yet." })]));
+    readme.removeAttribute("aria-busy");
+  });
   return el("article", { class: "case" },
     art,
-    el("p", { class: "tile-kicker", text: "Case study" }),
+    el("p", { class: "tile-kicker", text: project.previous_name ? `Case study, previously named ${project.previous_name}` : "Case study" }),
     el("h2", { id: "case-title", text: project.name }),
-    el("p", { class: "case-summary", text: f(project.summary) }),
+    el("p", { class: "case-summary", text: f(project.tagline || project.summary) }),
     el("ul", { class: "tags tags-sm" }, ...(project.stack || []).map((s) => el("li", { text: s }))),
     el("p", { class: "tile-links" },
       project.demo && el("a", { class: "button button-sm", href: project.demo.page, text: "Try the live demo" }),
       el("a", { class: "text-link strong", href: repoUrl(project), target: "_blank", rel: "noopener", text: "View the code" }),
+      project.release && el("a", { class: "activity-release", href: project.release.url, target: "_blank", rel: "noopener", text: project.release.tag }),
       ask),
     project.demo && el("p", { class: "case-note", text: "The demo server sleeps when idle. If it's asleep, the demo page wakes it, usually in under a minute, and shows a recorded example meanwhile." }),
-    el("div", { class: "case-result" }, el("h3", { text: "Result" }), withNumbers(el("p"), f(cs.result))),
-    el("div", { class: "case-grid" },
-      el("div", {}, el("h3", { text: "Problem" }), el("p", { text: f(cs.problem) })),
-      el("div", {}, el("h3", { text: "Approach" }), el("p", { text: f(cs.approach) }))),
-    cs.diagram?.length && el("ol", { class: "flow", "aria-label": `How ${project.name} works` },
-      ...cs.diagram.map((d) => el("li", {}, el("span", { class: "flow-step", text: d.step }), el("span", { class: "flow-detail", text: d.detail })))),
-    cs.decisions?.length && el("div", { class: "decisions" },
-      el("h3", { text: "Key decisions" }),
-      ...cs.decisions.map((d) => el("div", { class: "decision" }, el("h4", { text: d.title }), el("p", { text: f(d.detail) })))));
+    project.highlights?.length && el("div", { class: "case-result" },
+      el("h3", { text: "Highlights" }),
+      el("ul", {}, ...project.highlights.map((h) => withNumbers(el("li"), f(h))))),
+    el("div", { class: "case-readme" },
+      el("h3", {}, "From the README ", el("span", { class: "case-note", text: "(live from GitHub)" })),
+      readme));
 }
 
 // ----- small helpers -----
@@ -325,6 +396,13 @@ async function loadActivity(profile) {
   try {
     const repos = (await gh(`/users/${user}/repos?sort=pushed&per_page=8`)).slice(0, 6);
     const commitsByRepo = {};
+    const releaseByRepo = {};
+    await Promise.all(repos.map(async (r) => {
+      try {
+        const [release] = await gh(`/repos/${r.full_name}/releases?per_page=1`);
+        if (release && !release.draft) releaseByRepo[r.full_name] = release;
+      } catch { /* releases are optional */ }
+    }));
     await Promise.all(repos.map(async (r) => {
       try {
         const [latest] = await gh(`/repos/${r.full_name}/commits?per_page=1`);
@@ -342,6 +420,10 @@ async function loadActivity(profile) {
       const item = el("li", { "data-reveal": "" },
         el("div", { class: "activity-head" },
           el("a", { class: "activity-repo", href: repo.html_url, target: "_blank", rel: "noopener", text: repo.name }),
+          releaseByRepo[repo.full_name] && el("a", {
+            class: "activity-release", href: releaseByRepo[repo.full_name].html_url,
+            target: "_blank", rel: "noopener", text: releaseByRepo[repo.full_name].tag_name,
+          }),
           el("time", { datetime: commit.date, text: relativeTime(commit.date) })),
         el("a", { class: "activity-commit", href: commit.url, target: "_blank", rel: "noopener", text: firstLine(commit.message) }),
         repo.description && el("p", { class: "activity-desc", text: repo.description }),

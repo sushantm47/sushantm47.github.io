@@ -7,11 +7,11 @@
   --ink: #ededf0;
   --muted: #a1a1aa;
   --rule: #2a2a30;
-  --mark: #d97f8f;          /* wine tint: accent text and lines on dark */
-  --mark-ink: #f7eef0;
-  --fill: #7b2235;          /* burgundy: filled accents */
-  --fill-hover: #922a41;
-  --on-fill: #f7eef0;
+  --mark: #ef8a98;          /* wine tint: accent text and lines on dark */
+  --mark-ink: #ffffff;
+  --fill: #9e1b32;          /* burgundy: filled accents */
+  --fill-hover: #b32139;
+  --on-fill: #ffffff;
   --ok: #3dd68c;
   --shadow: 0 24px 60px rgb(2 6 18 / 0.55);
   --sans: "Geist", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -30,9 +30,9 @@
   --ink: #18181b;
   --muted: #63636b;
   --rule: #e4e4e7;
-  --mark: #8a1f37;
-  --fill: #7b2235;
-  --fill-hover: #922a41;
+  --mark: #8e1830;
+  --fill: #9e1b32;
+  --fill-hover: #b32139;
   --on-fill: #ffffff;
   --ok: #12a150;
   --shadow: 0 24px 60px rgb(15 23 42 / 0.16);
@@ -550,3 +550,59 @@ h1, h2, h3, h4 { font-weight: 600; letter-spacing: -0.025em; }
 .activity-desc { margin: 0.25rem 0 0; color: var(--muted); font-size: 0.92rem; }
 .activity .meta { margin: 0.2rem 0 0; font: 0.8rem var(--mono); color: var(--muted); }
 .activity-more { margin: 1rem 0 0; }
+
+/* ----- live demo badge, toolbox, release tags ----- */
+
+.tile-wrap { position: relative; display: flex; }
+.tile-wrap > .tile { flex: 1; }
+.demo-badge {
+  position: absolute; top: 0.9rem; right: 0.9rem; z-index: 2;
+  display: inline-flex; align-items: center; gap: 0.45rem;
+  padding: 0.35rem 0.75rem; border-radius: 999px; text-decoration: none;
+  font: 600 0.8rem var(--sans); color: var(--ink);
+  background: color-mix(in srgb, var(--bg) 72%, transparent);
+  border: 1px solid var(--rule); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  transition: border-color 160ms, transform 160ms;
+}
+.demo-badge:hover { border-color: var(--mark); transform: translateY(-1px); }
+
+.toolbox { margin-top: 2.5rem; }
+.toolbox h3 { font-size: 1.1rem; margin-bottom: 0.9rem; }
+.toolbox dl { margin: 0; display: grid; gap: 0.75rem; }
+.toolbox dl > div { display: grid; grid-template-columns: 11rem minmax(0, 1fr); gap: 0.5rem 1.25rem; align-items: baseline; }
+.toolbox dt { font: 600 0.9rem var(--sans); color: var(--muted); }
+.toolbox dd { margin: 0; }
+
+.activity-release {
+  font: 600 0.75rem var(--mono); text-decoration: none; color: var(--mark);
+  padding: 0.1rem 0.45rem; border-radius: 6px; border: 1px solid var(--rule); margin-left: auto;
+}
+.activity-release:hover { border-color: var(--mark); }
+
+@media (max-width: 720px) {
+  .toolbox dl > div { grid-template-columns: 1fr; }
+}
+
+/* ----- README rendered inside a case study ----- */
+
+.case-readme { margin-top: 2rem; border-top: 1px solid var(--rule); padding-top: 1.5rem; }
+.case-readme > h3 { display: flex; align-items: baseline; gap: 0.5rem; flex-wrap: wrap; }
+.readme { font-size: 0.97rem; line-height: 1.65; overflow-wrap: anywhere; }
+.readme h3, .readme h4, .readme h5, .readme h6 { margin: 1.6rem 0 0.5rem; font-size: 1.05rem; }
+.readme h4, .readme h5, .readme h6 { font-size: 0.98rem; color: var(--muted); }
+.readme p, .readme ul, .readme ol, .readme blockquote { margin: 0 0 0.9rem; }
+.readme ul, .readme ol { padding-left: 1.25rem; }
+.readme li { margin-bottom: 0.3rem; }
+.readme a { color: var(--mark); }
+.readme code { font: 0.86em var(--mono); background: var(--surface-2); border: 1px solid var(--rule); border-radius: 5px; padding: 0.05rem 0.35rem; }
+.readme pre { margin: 0 0 1rem; padding: 0.9rem 1rem; overflow-x: auto; background: var(--surface-2); border: 1px solid var(--rule); border-radius: 10px; }
+.readme pre code { background: none; border: 0; padding: 0; font-size: 0.85rem; }
+.readme blockquote { border-left: 3px solid var(--fill); padding-left: 0.9rem; color: var(--muted); }
+.readme hr { border: 0; border-top: 1px solid var(--rule); margin: 1.5rem 0; }
+.readme .table-wrap { overflow-x: auto; margin: 0 0 1rem; }
+.readme table { border-collapse: collapse; width: 100%; font-size: 0.88rem; }
+.readme th, .readme td { text-align: left; padding: 0.45rem 0.6rem; border-bottom: 1px solid var(--rule); vertical-align: top; overflow-wrap: normal; }
+.readme td:first-child, .readme th:first-child { min-width: 7.5rem; }
+.readme th { color: var(--muted); font-weight: 600; }
+.case-result ul { padding-left: 1.2rem; margin: 0.4rem 0 0; }
+.case-result li { margin-bottom: 0.45rem; }

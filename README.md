@@ -6,14 +6,41 @@ My personal portfolio, with an assistant you can question about my work. Ask it 
 my projects, experience, skills, or availability, and it answers from my resume and the
 READMEs of my GitHub repositories, citing the source of each fact.
 
+## Where the content comes from
+
+The site has no hand-maintained content. Everything comes from two sources:
+
+```
+assets/resume.pdf ──> parse_resume.py ──> resume.json ──┐
+GitHub repos tagged "portfolio" ────────────────────────┼─> build-site.mjs ─> site.json
+data/profile.json (headline, stats, chat settings) ─────┘          │
+                                                                   ├─> the page
+                                                                   ├─> the assistant's knowledge
+                                                                   └─> HTML for search engines
+```
+
+- **Resume:** summary, experience, education, skills, and project highlights are parsed
+  from the PDF on every build. Updating the site means replacing `assets/resume.pdf`.
+- **GitHub:** every public repository with the topic `portfolio` becomes a project, with
+  its description, topics, website (shown as a live demo link), latest release, and
+  README (shown as the case study). Case studies fetch the README live, so edits on
+  GitHub appear immediately.
+- **Rebuilds:** on every push and every hour, so new releases, descriptions, and README
+  changes reach the assistant and search engines without a commit here.
+
+Stat cards read their numbers from the resume, and the tests compare the site with the
+resume rather than with fixed wording, so a new resume never needs a code change. If the
+resume can't be parsed, the build stops with an error and the last good version of the
+site stays live.
+
 ## How the assistant works
 
 The assistant uses retrieval-augmented generation (RAG): it looks up relevant facts at
 question time instead of relying on a model's memory.
 
 ```
-profile.json ──┐
-repo READMEs ──┴─> build step ─> knowledge.json      (rebuilt on every deploy and weekly)
+site.json ────┐
+repo READMEs ─┴─> build step ─> knowledge.json      (rebuilt on every push and hourly)
 
 question ─> BM25 search over knowledge.json ─> top matching excerpts
                                                   │
@@ -21,7 +48,7 @@ question ─> BM25 search over knowledge.json ─> top matching excerpts
                                                       that cites the excerpts [1] [2]
 ```
 
-1. **Indexing:** a build step collects my profile and the README of every public repo I
+1. **Indexing:** a build step collects my resume content and the README of every public repo I
    own, splits them into heading-sized chunks, and publishes them as `knowledge.json`.
    New repos are picked up automatically.
 2. **Retrieval:** each question is matched against the chunks with BM25 keyword search.
@@ -55,10 +82,17 @@ assets/js/art.js             project tile artwork drawn as SVG in code
 assets/img/                  logo and favicon
 assets/js/chat.js            assistant UI and fallback answers
 assets/js/retrieval.js       BM25 search and markdown chunking
-assets/js/knowledge.js       turns the profile into searchable chunks
+assets/js/knowledge.js       turns the site model into searchable chunks
+assets/js/site-model.js      merges the resume, GitHub, and settings into the site model
+assets/js/markdown.js        safe Markdown rendering of README case studies
 assets/js/render.js          safe rendering of answers
-data/profile.json            resume content
-scripts/build-knowledge.mjs  builds knowledge.json from the profile and repos
+assets/resume.pdf            the resume: source of the site's content
+data/profile.json            settings: headline, stats, chat endpoint, demo pages
+data/resume.json             generated from the resume PDF
+data/site.json               generated: the merged site model
+scripts/parse_resume.py      reads the resume PDF
+scripts/build-site.mjs       merges the resume with GitHub repositories
+scripts/build-knowledge.mjs  builds knowledge.json from the site model and repos
 scripts/prerender.mjs        writes page text and metadata into the HTML
 worker/                      serverless LLM proxy
 tests/                       unit tests (node --test)

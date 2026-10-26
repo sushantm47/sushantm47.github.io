@@ -1,0 +1,192 @@
+{
+  "name": "Sushant Mudalgi",
+  "contact": {
+    "phone": "+1 (617) 407-3780",
+    "email": "mudalgi.s@northeastern.edu",
+    "linkedin": "https://linkedin.com/in/sushant-mudalgi",
+    "github": "https://github.com/sushantm47",
+    "website": "https://sushantm47.github.io"
+  },
+  "summary": "Software engineer with four years at Takeda, EY, and Deloitte building data platforms, backend services, and applied AI, from PySpark pipelines processing 200 to 300 GB daily to AI agents with evaluations and guardrails.",
+  "education": [
+    {
+      "school": "Northeastern University, Khoury College",
+      "degree": "MS in Computer Science",
+      "gpa": "",
+      "start": "Aug 2025",
+      "end": "May 2027",
+      "coursework": [
+        "Algorithms",
+        "Programming Design Paradigm",
+        "Building Scalable Distributed Systems",
+        "Foundations of AI",
+        "MLOps"
+      ]
+    },
+    {
+      "school": "KLE Technological University, Hubli",
+      "degree": "B.E. Computer Science",
+      "gpa": "3.91/4.00",
+      "start": "Aug 2017",
+      "end": "May 2021",
+      "coursework": [
+        "Distributed Cloud Computing",
+        "Computer Networks",
+        "Database Management Systems",
+        "Machine Learning"
+      ]
+    }
+  ],
+  "skills": [
+    {
+      "group": "Languages",
+      "items": [
+        "Python",
+        "Java",
+        "C++",
+        "C#",
+        "Go",
+        "TypeScript",
+        "JavaScript",
+        "SQL"
+      ]
+    },
+    {
+      "group": "Backend and Frontend",
+      "items": [
+        "Spring Boot",
+        "FastAPI",
+        "Flask",
+        "Django",
+        "Node.js",
+        "REST APIs",
+        "React",
+        "PostgreSQL",
+        "MySQL",
+        "MongoDB"
+      ]
+    },
+    {
+      "group": "Data",
+      "items": [
+        "PySpark",
+        "Databricks (Delta Lake, Unity Catalog)",
+        "dbt",
+        "Airflow",
+        "Talend",
+        "AWS Glue",
+        "Redshift",
+        "Snowflake",
+        "Tableau"
+      ]
+    },
+    {
+      "group": "Cloud and DevOps",
+      "items": [
+        "AWS (S3, Lambda, DMS, Step Functions, EventBridge, ECS Fargate, RDS, CDK)",
+        "Azure",
+        "GCP",
+        "Docker"
+      ]
+    },
+    {
+      "group": "AI and ML",
+      "items": [
+        "Claude",
+        "OpenAI API",
+        "LangChain",
+        "RAG",
+        "pgvector",
+        "MCP",
+        "Evals",
+        "PyTorch",
+        "scikit-learn",
+        "XGBoost",
+        "MLflow"
+      ]
+    }
+  ],
+  "experience": [
+    {
+      "company": "Takeda",
+      "title": "Data Engineer L4",
+      "location": "Bangalore, India",
+      "start": "May 2025",
+      "end": "Aug 2025",
+      "bullets": [
+        "Developed and maintained 15+ production PySpark pipelines on Databricks for PDT BioLife, powering analytics and regulatory reporting across North America and Europe under strict data compliance requirements.",
+        "Built secure ingestion with Unity Catalog and AWS (S3, DMS, Step Functions, Lambda), including scheduled snapshot delivery from Databricks Delta Marketplace so downstream teams always had fresh data.",
+        "Built React dashboards on campaign data for marketing and leadership, tracked runs in MLflow, and validated transformations with pytest in CI, using Claude Code and Copilot with review before every merge."
+      ]
+    },
+    {
+      "company": "EY GDS",
+      "title": "Data Engineer",
+      "location": "Bangalore, India",
+      "start": "Nov 2024",
+      "end": "Apr 2025",
+      "bullets": [
+        "Implemented 15 real time and batch PySpark pipelines processing 200 to 300 GB daily from SQL Server, SFTP, SharePoint, Heroku, and third party vendors, written in modular, object oriented Python.",
+        "Designed 30+ Delta Lake tables in a dbt medallion architecture for pharmaceutical reporting, with entity resolution merging duplicate records and ingestion automated through DMS, EventBridge, and S3.",
+        "Migrated orchestration from Step Functions to Tidal, cutting workflow costs 25 percent across 10+ Databricks workflows, and replaced manual metadata tagging with OpenAI API and LangChain automation.",
+        "Built containerized applications in Go with Docker, packaging services so they deployed the same way across environments."
+      ]
+    },
+    {
+      "company": "Deloitte USI",
+      "title": "Software Engineering Analyst",
+      "location": "Bangalore, India",
+      "start": "Sep 2021",
+      "end": "Nov 2024",
+      "bullets": [
+        "Designed fact and dimension tables in Amazon Redshift connected to Tableau, delivering data models and dashboards for J&J LifeScan reporting on IQVIA, Symphony Health, and JD Edwards ERP data.",
+        "Built ETL jobs in Talend and AWS Glue with reusable Python transformations, and led the Talend to Glue migration.",
+        "Applied K-Means, Mean Shift, linear regression, and XGBoost in Python to surface insights and forecasts from transactional data, and built pgvector semantic search and OpenAI API proofs of concept.",
+        "Wrote production C++, Java, and C# .NET code using OOD, including Spring Boot and Flask REST APIs for US Mobile with React front ends, deployed on Red Hat OpenShift through Jenkins CI/CD."
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "name": "RootCite",
+      "subtitle": "AI Copilot for Production Alerts",
+      "links": [
+        "Git",
+        "Demo"
+      ],
+      "stack": [
+        "Python",
+        "FastAPI",
+        "Claude",
+        "pgvector",
+        "AWS CDK"
+      ],
+      "bullets": [
+        "Built an AI copilot that diagnoses production alerts through a retrieve, investigate, synthesize, and verify loop on Claude, with tool calling, step and token budgets, and a citation for every claim.",
+        "Reached 1.000 hit@5 and MRR with hybrid BM25 and pgvector retrieval fused by reciprocal rank fusion, versus 0.909 for either alone, with an eval suite gating every merge in GitHub Actions.",
+        "Added prompt injection and PII guardrails and an MCP server, with Docker and AWS CDK infrastructure defined for ECS Fargate, RDS Postgres, and Secrets Manager."
+      ]
+    },
+    {
+      "name": "DealRadar",
+      "subtitle": "Amazon Price Tracker",
+      "links": [
+        "Git"
+      ],
+      "stack": [
+        "Python",
+        "Flask",
+        "MySQL",
+        "Chart.js"
+      ],
+      "bullets": [
+        "Built a full stack price tracker with a CloudScraper and BeautifulSoup scraper that handles deals, price ranges, and hidden prices, plus Chart.js price history charts in a Bootstrap dashboard.",
+        "Used MySQL triggers and stored procedures to flag price drops below user targets, and pulled deal news from RSS feeds."
+      ]
+    }
+  ],
+  "source": {
+    "file": "resume.pdf",
+    "sha256": "f5b81306c7109878"
+  }
+}

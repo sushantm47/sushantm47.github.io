@@ -10,7 +10,7 @@ built this way.
 ```
                     build time (GitHub Actions)                      request time
               ┌─────────────────────────────────────────┐
-profile.json ─┤                                         │
+site.json ────┤                                         │
               ├─> build-knowledge ─> knowledge.json ────┼──> Cloudflare Worker ──> LLM
 repo READMEs ─┤      (chunk + index)                    │      (search + prompt)
               │                                         │            │
@@ -31,7 +31,7 @@ looks things up at question time and is told to answer only from what it found.
 
 `scripts/build-knowledge.mjs` builds `data/knowledge.json`:
 
-- **From `profile.json`:** one chunk each for the summary, every project and case study,
+- **From `site.json`** (the resume merged with GitHub): one chunk each for the summary, every project and its highlights,
   every job, education, skills, and every FAQ entry.
 - **From GitHub:** it lists every public repo I own through the GitHub API (skipping
   forks and archived repos), downloads each README and any listed design docs, and splits
@@ -39,7 +39,7 @@ looks things up at question time and is told to answer only from what it found.
   picked up automatically.
 - Each chunk keeps its **title, source, and URL**, which is what makes citations possible.
 
-The build also checks that every featured repo name in `profile.json` exists, and
+The build also checks that every featured repository exists, and
 suggests the closest match if one is mistyped.
 
 ### 2. Retrieval
@@ -83,7 +83,9 @@ response records which model answered, which helps when debugging.
 
 ### Curated answers
 
-`profile.json` includes hand-written answers to the questions recruiters ask most ("What
+The build generates an answer to "What has Sushant built in production?" from the resume's
+experience, and `profile.json` adds a few answers the resume can't give (start date, roles
+sought, location). Earlier versions also kept hand-written answers to the questions recruiters ask most ("What
 has Sushant built in production?", "What's his strongest project?", "Which tools has he
 used at work?"). They're indexed like everything else, so retrieval matches them directly
 and the model starts from a complete, accurate answer instead of stitching fragments
@@ -150,7 +152,7 @@ sources. The assistant never shows an error page.
 The page is rendered by JavaScript, but `scripts/prerender.mjs` writes the complete page
 into the HTML at build time, so crawlers and link previews never need to run any code:
 
-- **All content:** hero, project tiles, more projects, stats, every role, education, and
+- **All content:** hero, project tiles, stats, every role, the toolbox of skills, education, and
   contact text, with the same markup the page script produces. When JavaScript runs, it
   replaces these with the interactive versions instead of adding a second copy.
 - **Real links:** GitHub, LinkedIn, resume, and email links are written in, marked
@@ -182,7 +184,7 @@ reaches the demo.
 
 Visits are counted with Cloudflare Web Analytics, which uses no cookies and stores no
 personal data, so no consent banner is needed. The script is added at build time only
-when a token is set in `profile.json`. Questions asked to the assistant show up as
+when a token is set in `data/profile.json`. Questions asked to the assistant show up as
 request counts on the Worker's own dashboard.
 
 ## Interaction design
@@ -212,7 +214,7 @@ are GitHub encrypted secrets, uploaded to Cloudflare as Worker secrets.
 
 ## Tests
 
-`npm test` runs 67 tests with Node's built-in test runner, covering retrieval and
+`npm test` runs 78 tests (plus the resume parser's Python tests) with Node's built-in test runner, covering retrieval and
 chunking, knowledge building and repo discovery, safe answer rendering, offline answers,
 the Worker (origin checks, validation, the three-model fallback chain, rate-limit handling),
 prerendering and escaping, cache busting, and layout helpers such as number highlighting

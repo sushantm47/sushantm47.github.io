@@ -4,7 +4,7 @@ import { test } from "node:test";
 import { fill, findPlaceholders, firstName, profileToChunks, repoUrl } from "../assets/js/knowledge.js";
 import { buildKnowledge, docTargets, selectRepos, suggestRepo } from "../scripts/build-knowledge.mjs";
 
-const profile = JSON.parse(await readFile(new URL("../data/profile.json", import.meta.url), "utf8"));
+const profile = JSON.parse(await readFile(new URL("../data/site.json", import.meta.url), "utf8"));
 
 test("profile.json is complete enough to render", () => {
   for (const key of ["name", "role", "headline", "links", "projects", "skills"]) assert.ok(profile[key], key);

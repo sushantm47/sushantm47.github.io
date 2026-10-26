@@ -1,4 +1,4 @@
-// Turns profile.json into retrievable knowledge chunks. Shared by the browser and the build script.
+// Turns the site model (data/site.json) into retrievable knowledge chunks. Shared by the browser and the build script.
 
 export function firstName(profile) {
   return String(profile.name || "").trim().split(/\s+/)[0] || "they";
@@ -56,17 +56,14 @@ export function profileToChunks(profile) {
         .join("\n"),
       repoUrl(p)
     );
-    const cs = p.case_study;
-    if (cs) {
+    if (p.highlights?.length) {
       add(
-        `case-study-${slug(p.name)}`,
-        `Case study: ${p.name}`,
+        `highlights-${slug(p.name)}`,
+        `Highlights: ${p.name}`,
         [
-          `Problem: ${cs.problem}`,
-          `Approach: ${cs.approach}`,
-          cs.diagram?.length && `How it works: ${cs.diagram.map((d) => `${d.step} (${d.detail})`).join(", then ")}.`,
-          ...(cs.decisions || []).map((d) => `Decision: ${d.title}. ${d.detail}`),
-          `Result: ${cs.result}`,
+          p.previous_name && `${p.name} was previously named ${p.previous_name}.`,
+          ...p.highlights,
+          p.release && `Latest release: ${p.release.tag}.`,
         ]
           .filter(Boolean)
           .join("\n"),

@@ -1,10 +1,13 @@
 name: Deploy site
 
+# The site's content comes from two sources, so it rebuilds whenever either can change:
+#   the resume PDF (assets/resume.pdf), on every push to main;
+#   GitHub repositories tagged "portfolio" (descriptions, releases, READMEs), every hour.
 on:
   push:
     branches: [main]
   schedule:
-    - cron: "0 6 * * 1" # every Monday: re-read your repos so the assistant stays current
+    - cron: "17 * * * *"
   workflow_dispatch:
 
 permissions:
@@ -24,13 +27,24 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install the PDF reader
+        run: pip install pypdf==5.9.0
+      - name: Read the resume
+        run: python scripts/parse_resume.py assets/resume.pdf data/resume.json
+      - name: Merge the resume with GitHub repositories tagged "portfolio"
+        run: node scripts/build-site.mjs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Tests
         run: npm test
-      - name: Build the assistant's knowledge from profile.json and your repos
+      - name: Build the assistant's knowledge
         run: node scripts/build-knowledge.mjs
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Write profile text into the HTML for search engines
+      - name: Write the content into the HTML for search engines
         run: node scripts/prerender.mjs --bust
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

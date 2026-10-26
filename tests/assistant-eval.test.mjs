@@ -6,7 +6,7 @@ import { buildMessages } from "../worker/src/index.js";
 import { profileToChunks } from "../assets/js/knowledge.js";
 
 const evals = JSON.parse(await readFile(new URL("../data/assistant-evals.json", import.meta.url), "utf8"));
-const profile = JSON.parse(await readFile(new URL("../data/profile.json", import.meta.url), "utf8"));
+const profile = JSON.parse(await readFile(new URL("../data/site.json", import.meta.url), "utf8"));
 const byQ = (q) => evals.cases.find((c) => c.question.startsWith(q));
 
 test("a strong recruiter answer passes the production-work check", () => {
@@ -44,7 +44,9 @@ test("the prompt asks for recruiter-quality answers", () => {
 test("curated answers keep exact numbers, and the summary no longer carries shortened stats", () => {
   const chunks = profileToChunks(profile);
   const production = chunks.find((c) => c.title === "What has Sushant built in production?");
-  assert.match(production.text, /200 to 300 GB/);
+  for (const job of profile.experience.filter((e) => e.points.length)) {
+    assert.ok(production.text.includes(job.points[0]), `${job.org}'s results are quoted exactly`);
+  }
   assert.match(production.text, /personal projects, not production systems/);
   assert.ok(!chunks.find((c) => c.id === "profile#about").text.includes("200+ GB"));
 });

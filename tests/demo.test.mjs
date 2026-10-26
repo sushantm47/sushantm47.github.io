@@ -6,7 +6,7 @@ import { profileToChunks } from "../assets/js/knowledge.js";
 import { demoPages, sitemap } from "../scripts/prerender.mjs";
 
 const read = (p) => readFile(new URL(`../${p}`, import.meta.url), "utf8");
-const profile = JSON.parse(await read("data/profile.json"));
+const profile = JSON.parse(await read("data/site.json"));
 const example = JSON.parse(await read("data/rootcite-example.json"));
 
 test("wake-up progress rises steadily but never claims to be done", () => {
